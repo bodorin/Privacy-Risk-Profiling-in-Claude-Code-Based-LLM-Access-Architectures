@@ -1,0 +1,1837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ontology
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  version="1.1"
+  date="2026-10-29"
+  language="en"
+  purpose="auto-install-claude-code-free">
+
+  <!-- ============================================================
+       META
+       ============================================================ -->
+  <meta>
+    <title>Ontology: Free Claude Code Solutions on Windows and Linux</title>
+    <version>1.1</version>
+    <date_created>2026-06-12</date_created>
+    <date_modified>2026-10-29</date_modified>
+    <data_source>Official documentation and public sources, compiled June 2026</data_source>
+    <purposes>
+      <purpose id="A">Reading and understanding by human agents</purpose>
+      <purpose id="B">Automated processing by AI agents</purpose>
+      <purpose id="C">BAT/CMD script generation for Windows 7+</purpose>
+      <purpose id="D">Bash script generation for Linux kernel 3.0+</purpose>
+      <purpose id="E">Automatic installation and configuration cross-platform</purpose>
+    </purposes>
+    <tier_structure>
+      <tier id="0" label="Practical Recommendation" num_solutions="1"/>
+      <tier id="1" label="100% Local — Unlimited Permanently Free" num_solutions="5"/>
+      <tier id="2" label="Free Cloud — Daily Limits" num_solutions="10"/>
+      <tier id="3" label="Free Credits — Temporary" num_solutions="5"/>
+    </tier_structure>
+    <compatibility_note>
+      Official Claude Code CLI requires Node.js 18+ (Windows 8.1+).
+      Python-based solutions (LiteLLM, llama.cpp) work on Windows 7 SP1+.
+    </compatibility_note>
+  </meta>
+
+  <!-- ============================================================
+       DEFINITIONS / GLOSSARY
+       ============================================================ -->
+  <definitions>
+    <term id="DEF_ANTHROPIC_BASE_URL">
+      <name>ANTHROPIC_BASE_URL</name>
+      <type>environment_variable</type>
+      <description>Environment variable that overrides the default Anthropic API endpoint.
+        Allows redirection to local servers or alternative proxies.</description>
+      <default_value>https://api.anthropic.com</default_value>
+      <examples>
+        <example>http://localhost:11434/v1 (Ollama local)</example>
+        <example>http://localhost:4000 (LiteLLM proxy)</example>
+        <example>http://localhost:1234/v1 (LM Studio)</example>
+      </examples>
+    </term>
+    <term id="DEF_ANTHROPIC_API_KEY">
+      <name>ANTHROPIC_API_KEY</name>
+      <type>environment_variable</type>
+      <description>Authentication key for the Anthropic API. When using a local server
+        or proxy, can be any non-empty string.</description>
+      <local_dummy_values>ollama, lmstudio, local, fake-key</local_dummy_values>
+    </term>
+    <term id="DEF_GGUF">
+      <name>GGUF</name>
+      <type>file_format</type>
+      <description>GPT-Generated Unified Format — file format for quantized LLM models.
+        Used by llama.cpp and LM Studio. Enables CPU and GPU inference.</description>
+    </term>
+    <term id="DEF_QUANTIZATION">
+      <name>Quantization</name>
+      <type>ml_technique</type>
+      <description>Reduction of numerical precision of model weights (e.g. 32-bit to 4-bit)
+        to reduce size and increase inference speed.</description>
+      <levels>
+        <level code="Q2_K">2-bit — smallest, reduced quality</level>
+        <level code="Q4_K_M">4-bit mixed medium — optimal balance</level>
+        <level code="Q5_K_M">5-bit mixed medium — good quality</level>
+        <level code="Q8_0">8-bit — near-full quality</level>
+        <level code="F16">16-bit float — full quality, double the size of Q8</level>
+      </levels>
+    </term>
+    <term id="DEF_TOOL_USE">
+      <name>Tool-use / Function calling</name>
+      <type>llm_capability</type>
+      <description>The ability of an LLM to call externally defined functions and interpret
+        the results. Required for full Claude Code functionality (file editing,
+        command execution, filesystem navigation).</description>
+    </term>
+    <term id="DEF_OPENROUTER">
+      <name>OpenRouter</name>
+      <type>cloud_service</type>
+      <description>API platform aggregating 200+ LLM models from various providers
+        (Anthropic, OpenAI, Google, Meta, Mistral etc.) under a single API key.
+        Offers 30+ completely free models with daily request limits.</description>
+      <url>https://openrouter.ai</url>
+    </term>
+    <term id="DEF_OLLAMA">
+      <name>Ollama</name>
+      <type>local_runtime</type>
+      <description>Open-source runtime for running LLM models locally. Since v0.14
+        (Jan 2026) includes native Anthropic Messages API compatibility.</description>
+      <url>https://ollama.com</url>
+      <key_version>0.14 — adds native Anthropic API compatibility</key_version>
+    </term>
+    <term id="DEF_LITELLM">
+      <name>LiteLLM</name>
+      <type>python_proxy</type>
+      <description>Python library and proxy that unifies 100+ LLM providers under
+        the OpenAI interface. Supports fallback, retry, load balancing.
+        Compatible with Python 3.8+ (including Windows 7 SP1).</description>
+      <url>https://github.com/BerriAI/litellm</url>
+    </term>
+    <term id="DEF_CCR">
+      <name>claude-code-router (ccr)</name>
+      <type>npm_proxy</type>
+      <description>Local npm proxy (MIT, 30k+ GitHub stars) that intercepts Claude Code
+        API calls and reroutes them to any configured LLM provider.</description>
+      <url>https://github.com/musistudio/claude-code-router</url>
+    </term>
+    <term id="DEF_MCP">
+      <name>MCP (Model Context Protocol)</name>
+      <type>protocol</type>
+      <description>Anthropic protocol for extending Claude Code capabilities with
+        external tools: filesystem, GitHub, databases, browser automation, etc.</description>
+    </term>
+    <term id="DEF_BEDROCK">
+      <name>Amazon Bedrock</name>
+      <type>cloud_service</type>
+      <description>AWS managed AI model service. Supports Claude Anthropic.
+        Claude Code has native Bedrock support.</description>
+    </term>
+    <term id="DEF_VERTEX">
+      <name>Google Vertex AI</name>
+      <type>cloud_service</type>
+      <description>Google Cloud platform for AI models. Supports Claude via
+        Anthropic-Google partnership. Claude Code has native Vertex AI support.</description>
+    </term>
+  </definitions>
+
+  <!-- ============================================================
+       GLOBAL DEPENDENCIES (common to multiple solutions)
+       ============================================================ -->
+  <global_dependencies>
+
+    <dependency id="DEP_NODEJS">
+      <name>Node.js</name>
+      <min_version>18.0.0</min_version>
+      <recommended_version>20.x LTS</recommended_version>
+      <windows_compatibility>Windows 8.1+ for v18, Windows 10+ for v20+</windows_compatibility>
+      <linux_compatibility>Linux kernel 3.10+ for v18, kernel 4.4+ for v20+</linux_compatibility>
+      <url_windows>https://nodejs.org/en/download</url_windows>
+      <url_linux_nodesource>https://deb.nodesource.com/setup_20.x</url_linux_nodesource>
+      <install_windows_winget>winget install OpenJS.NodeJS.LTS</install_windows_winget>
+      <install_linux_ubuntu>
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &amp;&amp; sudo apt-get install -y nodejs
+      </install_linux_ubuntu>
+      <install_linux_fedora>sudo dnf install nodejs npm</install_linux_fedora>
+      <install_linux_arch>sudo pacman -S nodejs npm</install_linux_arch>
+      <verify>node --version</verify>
+    </dependency>
+
+    <dependency id="DEP_PYTHON">
+      <name>Python</name>
+      <min_version>3.8</min_version>
+      <recommended_version>3.11+</recommended_version>
+      <windows_compatibility>Windows Vista SP2+ for v3.8, Windows 7 SP1+ with patches</windows_compatibility>
+      <linux_compatibility>Available on any modern distribution</linux_compatibility>
+      <url_windows>https://python.org/downloads</url_windows>
+      <install_windows>Download installer from https://python.org and check "Add Python to PATH"</install_windows>
+      <install_linux_ubuntu>sudo apt-get install -y python3 python3-pip</install_linux_ubuntu>
+      <install_linux_fedora>sudo dnf install python3 python3-pip</install_linux_fedora>
+      <verify>python --version</verify>
+      <win7_note>Python 3.8 is the last version with official Windows 7 SP1 support.</win7_note>
+    </dependency>
+
+    <dependency id="DEP_GIT">
+      <name>Git</name>
+      <min_version>2.0.0</min_version>
+      <url_windows>https://git-scm.com/download/win</url_windows>
+      <install_windows_winget>winget install Git.Git</install_windows_winget>
+      <install_linux_ubuntu>sudo apt-get install -y git</install_linux_ubuntu>
+      <verify>git --version</verify>
+    </dependency>
+
+    <dependency id="DEP_CURL">
+      <name>curl</name>
+      <note>Included in Windows 10 build 1803+. On Win7/8 download from https://curl.se/windows/</note>
+      <install_linux_ubuntu>sudo apt-get install -y curl</install_linux_ubuntu>
+      <verify>curl --version</verify>
+    </dependency>
+
+  </global_dependencies>
+
+  <!-- ============================================================
+       SOLUTIONS
+       ============================================================ -->
+  <solutions>
+
+    <!-- ============================================================
+         TIER 0 — PRACTICAL RECOMMENDATION
+         ============================================================ -->
+    <tier id="0" type="practical-recommendation" label="Practical Recommendation — Optimal Combination">
+
+      <solution id="T0">
+        <identifier>T0</identifier>
+        <title>Ollama Local + Claude Code Router + OpenRouter Cloud Fallback</title>
+        <subtitle>Best combination for daily use</subtitle>
+        <description>Hybrid architecture: private projects and long sessions go to local Ollama
+          (zero cost, zero upload, zero limits); complex tasks or short sessions go to
+          OpenRouter cloud (free, more powerful models). The router switches automatically
+          based on configured rules or on demand with /model.</description>
+
+        <architecture>
+          <flow id="F1">
+            <condition>Private project / sensitive code</condition>
+            <destination>Ollama local — Qwen3-Coder or DeepSeek-Coder</destination>
+            <reasons>Zero external upload, zero cost, zero limits, maximum privacy</reasons>
+          </flow>
+          <flow id="F2">
+            <condition>Public project / complex task / long context</condition>
+            <destination>OpenRouter free tier — Llama 3.3 70B or other free model</destination>
+            <reasons>More powerful model, no local RAM consumption</reasons>
+          </flow>
+        </architecture>
+
+        <components>
+          <component id="T0_C1" ref_dep="DEP_NODEJS">
+            <name>Node.js</name>
+            <min_version>18.0.0</min_version>
+            <role>Runtime for Claude Code and claude-code-router</role>
+          </component>
+          <component id="T0_C2">
+            <name>Claude Code CLI</name>
+            <npm_package>@anthropic-ai/claude-code</npm_package>
+            <install>npm install -g @anthropic-ai/claude-code</install>
+            <license>MIT</license>
+            <url>https://npmjs.com/package/@anthropic-ai/claude-code</url>
+          </component>
+          <component id="T0_C3">
+            <name>Ollama</name>
+            <min_version>0.14</min_version>
+            <url_windows>https://ollama.com/download/OllamaSetup.exe</url_windows>
+            <url_linux>https://ollama.com/install.sh</url_linux>
+            <license>MIT</license>
+          </component>
+          <component id="T0_C4">
+            <name>Claude Code Router</name>
+            <npm_package>@musistudio/claude-code-router</npm_package>
+            <install>npm install -g @musistudio/claude-code-router</install>
+            <command_alias>ccr</command_alias>
+            <license>MIT</license>
+            <url>https://github.com/musistudio/claude-code-router</url>
+          </component>
+          <component id="T0_C5">
+            <name>OpenRouter Account</name>
+            <type>cloud_service</type>
+            <url>https://openrouter.ai</url>
+            <cost>Free for models marked :free</cost>
+          </component>
+          <component id="T0_C6">
+            <name>Local model: qwen3-coder</name>
+            <download>ollama pull qwen3-coder</download>
+            <size_gb_approx>5-7</size_gb_approx>
+            <license>Apache 2.0</license>
+          </component>
+        </components>
+
+        <system_requirements>
+          <windows>
+            <min_version>10</min_version>
+            <ram_gb_min>8</ram_gb_min>
+            <ram_gb_recommended>16</ram_gb_recommended>
+            <disk_gb_min>15</disk_gb_min>
+            <gpu_optional>true</gpu_optional>
+            <internet_required>Partial (only for OpenRouter component)</internet_required>
+          </windows>
+          <linux>
+            <kernel_min>4.0</kernel_min>
+            <ram_gb_min>8</ram_gb_min>
+            <disk_gb_min>15</disk_gb_min>
+          </linux>
+        </system_requirements>
+
+        <installation>
+          <windows>
+            <steps>
+              <step order="1">
+                <title>Check and install Node.js</title>
+                <verify_command>node --version</verify_command>
+                <action_if_missing>winget install OpenJS.NodeJS.LTS</action_if_missing>
+                <url_alternative>https://nodejs.org/en/download</url_alternative>
+              </step>
+              <step order="2">
+                <title>Install Claude Code CLI</title>
+                <command>npm install -g @anthropic-ai/claude-code</command>
+                <verify>claude --version</verify>
+              </step>
+              <step order="3">
+                <title>Install Ollama</title>
+                <command_winget>winget install Ollama.Ollama</command_winget>
+                <url_installer>https://ollama.com/download/OllamaSetup.exe</url_installer>
+                <note>Ollama starts automatically as a Windows service after installation</note>
+              </step>
+              <step order="4">
+                <title>Download local Qwen3-Coder model</title>
+                <command>ollama pull qwen3-coder</command>
+                <duration_estimate>10-30 minutes (depends on connection)</duration_estimate>
+                <small_alternative>ollama pull qwen3-coder:4b</small_alternative>
+              </step>
+              <step order="5">
+                <title>Install Claude Code Router</title>
+                <command>npm install -g @musistudio/claude-code-router</command>
+              </step>
+              <step order="6">
+                <title>Set environment variables for Ollama</title>
+                <command_cmd>setx ANTHROPIC_BASE_URL "http://localhost:11434/v1"</command_cmd>
+                <command_cmd2>setx ANTHROPIC_API_KEY "ollama"</command_cmd2>
+                <note>Requires terminal restart after setting</note>
+              </step>
+              <step order="7">
+                <title>Create router config file</title>
+                <config_path>%APPDATA%\claude-code-router\config.json</config_path>
+                <config_content><![CDATA[{
+  "providers": {
+    "ollama": {
+      "baseUrl": "http://localhost:11434/api",
+      "type": "ollama"
+    },
+    "openrouter": {
+      "apiKey": "sk-or-REPLACE_WITH_YOUR_KEY",
+      "baseUrl": "https://openrouter.ai/api/v1"
+    }
+  },
+  "Router": {
+    "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+    "private": "ollama,qwen3-coder",
+    "background": "openrouter,deepseek/deepseek-chat:free"
+  }
+}]]></config_content>
+              </step>
+            </steps>
+
+            <script_bat><![CDATA[@echo off
+:: =============================================================================
+:: TIER 0 - Auto-install: Ollama + Claude Code + CCR + OpenRouter
+:: Compatible: Windows 10+
+:: Usage: install_tier0.bat [OPENROUTER_API_KEY]
+:: =============================================================================
+setlocal enabledelayedexpansion
+
+set "OPENROUTER_KEY=%~1"
+if "%OPENROUTER_KEY%"=="" (
+  echo [WARNING] No OpenRouter key provided as argument.
+  echo Usage: install_tier0.bat sk-or-YOUR_KEY
+  echo Continuing without OpenRouter key (only local Ollama will work).
+  set "OPENROUTER_KEY=sk-or-REPLACE_WITH_YOUR_KEY"
+)
+
+echo.
+echo ============================================================
+echo  INSTALL TIER 0: Ollama + Claude Code + Router + OpenRouter
+echo ============================================================
+echo.
+
+:: --- Check Node.js ---
+echo [1/7] Checking Node.js...
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo Node.js not found. Installing via winget...
+  winget install --id OpenJS.NodeJS.LTS -e --silent
+  if %errorlevel% neq 0 (
+    echo ERROR: Could not install Node.js automatically.
+    echo Download manually from https://nodejs.org
+    pause & exit /b 1
+  )
+  echo Node.js installed successfully.
+) else (
+  echo Node.js found: OK
+)
+
+:: --- Install Claude Code ---
+echo.
+echo [2/7] Installing Claude Code CLI...
+call npm install -g @anthropic-ai/claude-code
+if %errorlevel% neq 0 (
+  echo ERROR: Claude Code installation failed.
+  pause & exit /b 1
+)
+echo Claude Code installed: OK
+
+:: --- Install Ollama ---
+echo.
+echo [3/7] Installing Ollama...
+ollama --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo Ollama not found. Downloading installer...
+  curl -L "https://ollama.com/download/OllamaSetup.exe" -o "%TEMP%\OllamaSetup.exe"
+  if %errorlevel% neq 0 (
+    echo ERROR: Ollama download failed. Check internet connection.
+    pause & exit /b 1
+  )
+  echo Installing Ollama...
+  start /wait "%TEMP%\OllamaSetup.exe" /S
+  timeout /t 5 /nobreak >nul
+  echo Ollama installed: OK
+) else (
+  echo Ollama found: OK
+)
+
+:: --- Download model ---
+echo.
+echo [4/7] Downloading Qwen3-Coder model (may take 10-30 minutes)...
+ollama pull qwen3-coder
+if %errorlevel% neq 0 (
+  echo WARNING: Model download failed. Trying small 4B variant...
+  ollama pull qwen3-coder:4b
+)
+echo Model downloaded: OK
+
+:: --- Install Claude Code Router ---
+echo.
+echo [5/7] Installing Claude Code Router...
+call npm install -g @musistudio/claude-code-router
+echo CCR installed: OK
+
+:: --- Environment variables ---
+echo.
+echo [6/7] Setting Ollama environment variables...
+setx ANTHROPIC_BASE_URL "http://localhost:11434/v1" >nul
+setx ANTHROPIC_API_KEY "ollama" >nul
+echo Variables set: OK
+
+:: --- Router config ---
+echo.
+echo [7/7] Creating router config file...
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {
+echo   "providers": {
+echo     "ollama": {
+echo       "baseUrl": "http://localhost:11434/api",
+echo       "type": "ollama"
+echo     },
+echo     "openrouter": {
+echo       "apiKey": "!OPENROUTER_KEY!",
+echo       "baseUrl": "https://openrouter.ai/api/v1"
+echo     }
+echo   },
+echo   "Router": {
+echo     "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+echo     "private": "ollama,qwen3-coder",
+echo     "background": "openrouter,deepseek/deepseek-chat:free"
+echo   }
+echo }
+) > "%APPDATA%\claude-code-router\config.json"
+echo Config created: OK
+
+echo.
+echo ============================================================
+echo  INSTALLATION COMPLETE!
+echo ============================================================
+echo.
+echo  USAGE:
+echo    claude --model qwen3-coder   (Ollama local)
+echo    ccr code                      (Auto router local+cloud)
+echo.
+echo  NOTE: Reopen terminal for environment variables to take effect.
+echo ============================================================
+pause
+endlocal]]></script_bat>
+
+            <script_powershell><![CDATA[# =============================================================================
+# TIER 0 - Auto-install PowerShell: Ollama + Claude Code + CCR
+# Compatible: Windows 10+, PowerShell 5.1+
+# Usage: .\install_tier0.ps1 -OpenRouterKey "sk-or-YOUR_KEY"
+# =============================================================================
+
+param(
+    [string]$OpenRouterKey = "sk-or-REPLACE_WITH_YOUR_KEY",
+    [switch]$SmallModel = $false
+)
+
+$ErrorActionPreference = "Stop"
+
+function Write-Step($num, $total, $msg) {
+    Write-Host "`n[$num/$total] $msg" -ForegroundColor Cyan
+}
+
+function Test-Command($cmd) {
+    return (Get-Command $cmd -ErrorAction SilentlyContinue) -ne $null
+}
+
+Write-Host "=" * 60 -ForegroundColor Green
+Write-Host " INSTALL TIER 0: Ollama + Claude Code + Router" -ForegroundColor Green
+Write-Host "=" * 60 -ForegroundColor Green
+
+# --- 1. Node.js ---
+Write-Step 1 7 "Check/Install Node.js..."
+if (-not (Test-Command "node")) {
+    Write-Host "Node.js missing. Installing via winget..." -ForegroundColor Yellow
+    winget install --id OpenJS.NodeJS.LTS -e --silent
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+} else {
+    Write-Host "Node.js: $(node --version) - OK" -ForegroundColor Green
+}
+
+# --- 2. Claude Code ---
+Write-Step 2 7 "Installing Claude Code CLI..."
+npm install -g @anthropic-ai/claude-code
+Write-Host "Claude Code: OK" -ForegroundColor Green
+
+# --- 3. Ollama ---
+Write-Step 3 7 "Check/Install Ollama..."
+if (-not (Test-Command "ollama")) {
+    Write-Host "Ollama missing. Downloading..." -ForegroundColor Yellow
+    $installerPath = "$env:TEMP\OllamaSetup.exe"
+    Invoke-WebRequest -Uri "https://ollama.com/download/OllamaSetup.exe" -OutFile $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
+    Start-Sleep -Seconds 5
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + $env:Path
+} else {
+    Write-Host "Ollama: $(ollama --version) - OK" -ForegroundColor Green
+}
+
+# --- 4. Model ---
+Write-Step 4 7 "Downloading local model..."
+$modelName = if ($SmallModel) { "qwen3-coder:4b" } else { "qwen3-coder" }
+Write-Host "Downloading $modelName (may take 10-30 minutes)..." -ForegroundColor Yellow
+ollama pull $modelName
+Write-Host "Model $modelName: OK" -ForegroundColor Green
+
+# --- 5. CCR ---
+Write-Step 5 7 "Installing Claude Code Router (ccr)..."
+npm install -g @musistudio/claude-code-router
+Write-Host "CCR: OK" -ForegroundColor Green
+
+# --- 6. Env vars ---
+Write-Step 6 7 "Setting environment variables (user level)..."
+[System.Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "http://localhost:11434/v1", "User")
+[System.Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "ollama", "User")
+$env:ANTHROPIC_BASE_URL = "http://localhost:11434/v1"
+$env:ANTHROPIC_API_KEY = "ollama"
+Write-Host "Variables set: OK" -ForegroundColor Green
+
+# --- 7. Router config ---
+Write-Step 7 7 "Creating router config..."
+$configDir = "$env:APPDATA\claude-code-router"
+if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir -Force | Out-Null }
+
+$config = @{
+    providers = @{
+        ollama = @{ baseUrl = "http://localhost:11434/api"; type = "ollama" }
+        openrouter = @{ apiKey = $OpenRouterKey; baseUrl = "https://openrouter.ai/api/v1" }
+    }
+    Router = @{
+        "default" = "openrouter,meta-llama/llama-3.3-70b-instruct:free"
+        "private" = "ollama,qwen3-coder"
+        "background" = "openrouter,deepseek/deepseek-chat:free"
+    }
+} | ConvertTo-Json -Depth 5
+
+Set-Content -Path "$configDir\config.json" -Value $config -Encoding UTF8
+Write-Host "Config created: OK" -ForegroundColor Green
+
+Write-Host "`n" + "=" * 60 -ForegroundColor Green
+Write-Host " INSTALLATION COMPLETE!" -ForegroundColor Green
+Write-Host "=" * 60 -ForegroundColor Green
+Write-Host "`n  claude --model qwen3-coder   (Ollama local)"
+Write-Host "  ccr code                      (Auto router)"
+Write-Host "`n  NOTE: Reopen terminal for environment variables.`n"]]></script_powershell>
+          </windows>
+
+          <linux>
+            <steps>
+              <step order="1">
+                <title>Install Node.js 20.x</title>
+                <ubuntu_debian><![CDATA[curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs]]></ubuntu_debian>
+                <fedora>sudo dnf install nodejs npm</fedora>
+                <arch>sudo pacman -S nodejs npm</arch>
+              </step>
+              <step order="2">
+                <title>Install Claude Code CLI</title>
+                <command>npm install -g @anthropic-ai/claude-code</command>
+              </step>
+              <step order="3">
+                <title>Install Ollama</title>
+                <command>curl -fsSL https://ollama.com/install.sh | sh</command>
+                <note>Ollama registers as a systemd service and starts automatically</note>
+              </step>
+              <step order="4">
+                <title>Download model</title>
+                <command>ollama pull qwen3-coder</command>
+              </step>
+              <step order="5">
+                <title>Install Claude Code Router</title>
+                <command>npm install -g @musistudio/claude-code-router</command>
+              </step>
+              <step order="6">
+                <title>Set permanent environment variables</title>
+                <command><![CDATA[echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> ~/.bashrc
+echo 'export ANTHROPIC_API_KEY="ollama"' >> ~/.bashrc
+source ~/.bashrc]]></command>
+              </step>
+              <step order="7">
+                <title>Create router config</title>
+                <command><![CDATA[mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << 'EOF'
+{
+  "providers": {
+    "ollama": { "baseUrl": "http://localhost:11434/api", "type": "ollama" },
+    "openrouter": {
+      "apiKey": "sk-or-REPLACE_WITH_YOUR_KEY",
+      "baseUrl": "https://openrouter.ai/api/v1"
+    }
+  },
+  "Router": {
+    "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+    "private": "ollama,qwen3-coder",
+    "background": "openrouter,deepseek/deepseek-chat:free"
+  }
+}
+EOF]]></command>
+              </step>
+            </steps>
+
+            <script_bash><![CDATA[#!/bin/bash
+# =============================================================================
+# TIER 0 - Auto-install Linux: Ollama + Claude Code + CCR + OpenRouter
+# Compatible: Ubuntu 18.04+, Debian 10+, Fedora 32+, Arch Linux
+# Usage: bash install_tier0.sh [OPENROUTER_API_KEY]
+# =============================================================================
+
+set -e
+
+OPENROUTER_KEY="${1:-sk-or-REPLACE_WITH_YOUR_KEY}"
+MODEL="${MODEL:-qwen3-coder}"
+BASHRC="${HOME}/.bashrc"
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
+
+log_step() { echo -e "\n${CYAN}[$1/$2] $3${NC}"; }
+log_ok()   { echo -e "${GREEN}  ✓ $1${NC}"; }
+log_warn() { echo -e "${YELLOW}  ⚠ $1${NC}"; }
+log_err()  { echo -e "${RED}  ✗ $1${NC}" >&2; exit 1; }
+
+detect_distro() {
+    if   [ -f /etc/debian_version ]; then echo "debian"
+    elif [ -f /etc/fedora-release  ]; then echo "fedora"
+    elif [ -f /etc/arch-release    ]; then echo "arch"
+    else echo "unknown"; fi
+}
+
+DISTRO=$(detect_distro)
+
+echo "================================================================"
+echo " INSTALL TIER 0: Ollama + Claude Code + Router | Linux"
+echo "================================================================"
+echo " Detected distribution: $DISTRO"
+echo " Local model: $MODEL"
+echo "================================================================"
+
+# --- 1. Node.js ---
+log_step 1 7 "Check/Install Node.js..."
+if ! command -v node &>/dev/null; then
+    log_warn "Node.js missing. Installing..."
+    case "$DISTRO" in
+        debian)
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt-get install -y nodejs ;;
+        fedora)
+            sudo dnf install -y nodejs npm ;;
+        arch)
+            sudo pacman -S --noconfirm nodejs npm ;;
+        *)
+            log_err "Unknown distribution. Please install Node.js manually." ;;
+    esac
+fi
+log_ok "Node.js $(node --version)"
+
+# --- 2. Claude Code ---
+log_step 2 7 "Installing Claude Code CLI..."
+npm install -g @anthropic-ai/claude-code
+log_ok "Claude Code $(claude --version 2>/dev/null || echo 'installed')"
+
+# --- 3. Ollama ---
+log_step 3 7 "Check/Install Ollama..."
+if ! command -v ollama &>/dev/null; then
+    log_warn "Ollama missing. Installing..."
+    curl -fsSL https://ollama.com/install.sh | sh
+    sudo systemctl enable ollama 2>/dev/null || true
+    sudo systemctl start  ollama 2>/dev/null || ollama serve &
+    sleep 3
+fi
+log_ok "Ollama $(ollama --version)"
+
+# --- 4. Model ---
+log_step 4 7 "Downloading model $MODEL (10-30 minutes)..."
+ollama pull "$MODEL" || {
+    log_warn "Download failed for $MODEL, trying small variant..."
+    ollama pull qwen3-coder:4b
+    MODEL="qwen3-coder:4b"
+}
+log_ok "Model $MODEL downloaded"
+
+# --- 5. CCR ---
+log_step 5 7 "Installing Claude Code Router..."
+npm install -g @musistudio/claude-code-router
+log_ok "CCR installed"
+
+# --- 6. Env vars ---
+log_step 6 7 "Setting permanent environment variables..."
+grep -q "ANTHROPIC_BASE_URL" "$BASHRC" 2>/dev/null || \
+    echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> "$BASHRC"
+grep -q "ANTHROPIC_API_KEY" "$BASHRC" 2>/dev/null || \
+    echo 'export ANTHROPIC_API_KEY="ollama"' >> "$BASHRC"
+export ANTHROPIC_BASE_URL="http://localhost:11434/v1"
+export ANTHROPIC_API_KEY="ollama"
+log_ok "Variables set in $BASHRC"
+
+# --- 7. Router config ---
+log_step 7 7 "Creating router config..."
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << JSONEOF
+{
+  "providers": {
+    "ollama": {
+      "baseUrl": "http://localhost:11434/api",
+      "type": "ollama"
+    },
+    "openrouter": {
+      "apiKey": "${OPENROUTER_KEY}",
+      "baseUrl": "https://openrouter.ai/api/v1"
+    }
+  },
+  "Router": {
+    "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+    "private": "ollama,${MODEL}",
+    "background": "openrouter,deepseek/deepseek-chat:free"
+  }
+}
+JSONEOF
+log_ok "Config created: ~/.claude-code-router/config.json"
+
+echo ""
+echo "================================================================"
+echo -e " ${GREEN}INSTALLATION COMPLETE!${NC}"
+echo "================================================================"
+echo ""
+echo "  claude --model $MODEL   → Ollama local (unlimited)"
+echo "  ccr code                 → Auto router (local + cloud)"
+echo ""
+echo "  Reload shell: source ~/.bashrc"
+echo "================================================================"]]></script_bash>
+          </linux>
+        </installation>
+
+        <usage>
+          <command_local_windows>claude --model qwen3-coder</command_local_windows>
+          <command_router_windows>ccr code</command_router_windows>
+          <command_local_linux>claude --model qwen3-coder</command_local_linux>
+          <command_router_linux>ccr code</command_router_linux>
+          <switch_model_in_session>/model qwen3-coder</switch_model_in_session>
+          <switch_cloud_in_session>/model meta-llama/llama-3.3-70b-instruct:free</switch_cloud_in_session>
+        </usage>
+
+        <status>
+          <free_type>hybrid-unlimited-local-plus-cloud-limits</free_type>
+          <monthly_cost>0 USD (completely free)</monthly_cost>
+          <limits>None for Ollama component; 50-1000 req/day for OpenRouter free</limits>
+          <recommendation_rating>5/5</recommendation_rating>
+          <difficulty_level>medium</difficulty_level>
+        </status>
+      </solution>
+    </tier>
+
+    <!-- ============================================================
+         TIER 1 — 100% LOCAL, UNLIMITED PERMANENT
+         ============================================================ -->
+    <tier id="1" type="local-unlimited" label="100% Local — Permanently Free, Unlimited">
+
+      <solution id="S1_1">
+        <identifier>S1.1</identifier>
+        <title>Ollama v0.14+ + Qwen3-Coder + Claude Code (RECOMMENDED LOCAL)</title>
+        <description>Primary local solution. Ollama v0.14+ includes native Anthropic-compatible API.
+          Qwen3-Coder (Alibaba) is the best-performing open-source coding model for
+          mid-range hardware. Zero cost, zero rate-limit, zero external data upload.</description>
+        <system_requirements>
+          <windows><min_version>10</min_version><ram_gb_min>8</ram_gb_min><disk_gb_min>10</disk_gb_min></windows>
+          <linux><kernel_min>4.0</kernel_min><ram_gb_min>8</ram_gb_min><disk_gb_min>10</disk_gb_min></linux>
+        </system_requirements>
+        <components>
+          <component><name>Claude Code CLI</name><install>npm install -g @anthropic-ai/claude-code</install></component>
+          <component><name>Ollama v0.14+</name><url_windows>https://ollama.com/download/OllamaSetup.exe</url_windows></component>
+          <component><name>qwen3-coder</name><download>ollama pull qwen3-coder</download><size_gb>5-7</size_gb></component>
+        </components>
+        <env_vars>
+          <var><name>ANTHROPIC_BASE_URL</name><value>http://localhost:11434/v1</value></var>
+          <var><name>ANTHROPIC_API_KEY</name><value>ollama</value></var>
+        </env_vars>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S1.1] Install Ollama + Qwen3-Coder + Claude Code
+node --version >nul 2>&1 || (winget install OpenJS.NodeJS.LTS -e --silent)
+npm install -g @anthropic-ai/claude-code
+ollama --version >nul 2>&1 || (
+  curl -L https://ollama.com/download/OllamaSetup.exe -o "%TEMP%\Ollama.exe"
+  start /wait "%TEMP%\Ollama.exe" /S
+  timeout /t 5 /nobreak >nul
+)
+ollama pull qwen3-coder
+setx ANTHROPIC_BASE_URL "http://localhost:11434/v1" >nul
+setx ANTHROPIC_API_KEY "ollama" >nul
+echo Done! Run: claude --model qwen3-coder
+pause
+endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+if ! command -v node &>/dev/null; then
+  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  sudo apt-get install -y nodejs 2>/dev/null || sudo dnf install -y nodejs 2>/dev/null || sudo pacman -S --noconfirm nodejs
+fi
+npm install -g @anthropic-ai/claude-code
+command -v ollama &>/dev/null || curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen3-coder
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="ollama"' >> ~/.bashrc
+echo "Done! Run: source ~/.bashrc && claude --model qwen3-coder"]]></script_install_linux_bash>
+        <usage>
+          <command>claude --model qwen3-coder</command>
+          <alternative_models>
+            <model>ollama pull deepseek-coder-v3</model>
+            <model>ollama pull gemma4:27b</model>
+            <model>ollama pull codellama:34b</model>
+            <model>ollama pull llama3.3:70b</model>
+            <model>ollama pull qwen3-coder:4b  (small variant, &lt;8GB RAM)</model>
+          </alternative_models>
+        </usage>
+        <status><free_type>unlimited-permanent</free_type><rating>5/5</rating></status>
+      </solution>
+
+      <solution id="S1_2">
+        <identifier>S1.2</identifier>
+        <title>Ollama + Gemma 4 27B + Claude Code</title>
+        <description>Gemma 4 (Google, 2025) 27-billion parameter model. 128K token context,
+          excellent multilingual support. Requires stronger hardware.</description>
+        <system_requirements>
+          <windows><min_version>10</min_version><ram_gb_min>16</ram_gb_min><disk_gb_min>18</disk_gb_min><gpu_vram_gb_recommended>8</gpu_vram_gb_recommended></windows>
+          <linux><kernel_min>4.0</kernel_min><ram_gb_min>16</ram_gb_min><disk_gb_min>18</disk_gb_min></linux>
+        </system_requirements>
+        <env_vars>
+          <var><name>ANTHROPIC_BASE_URL</name><value>http://localhost:11434/v1</value></var>
+          <var><name>ANTHROPIC_API_KEY</name><value>ollama</value></var>
+        </env_vars>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S1.2] Install Ollama + Gemma4:27B + Claude Code
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+ollama --version >nul 2>&1 || (
+  curl -L https://ollama.com/download/OllamaSetup.exe -o "%TEMP%\Ollama.exe"
+  start /wait "%TEMP%\Ollama.exe" /S & timeout /t 5 /nobreak >nul
+)
+echo Downloading Gemma4 27B (~16GB, may take 20-60 minutes)...
+ollama pull gemma4:27b
+setx ANTHROPIC_BASE_URL "http://localhost:11434/v1" >nul
+setx ANTHROPIC_API_KEY "ollama" >nul
+echo Done! Run: claude --model gemma4:27b
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+command -v ollama &>/dev/null || curl -fsSL https://ollama.com/install.sh | sh
+echo "Downloading Gemma4 27B (~16GB)..."
+ollama pull gemma4:27b
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="ollama"' >> ~/.bashrc
+echo "Done! source ~/.bashrc && claude --model gemma4:27b"]]></script_install_linux_bash>
+        <usage>
+          <command>claude --model gemma4:27b</command>
+          <long_context>OLLAMA_NUM_CTX=65536 claude --model gemma4:27b</long_context>
+        </usage>
+        <status><free_type>unlimited-permanent</free_type><rating>4/5 (requires hardware)</rating></status>
+      </solution>
+
+      <solution id="S1_3">
+        <identifier>S1.3</identifier>
+        <title>LM Studio + DeepSeek Coder V3 + Claude Code</title>
+        <description>LM Studio is a cross-platform GUI application for downloading and running
+          GGUF models. Exposes an OpenAI-compatible server. Claude Code connects via
+          ANTHROPIC_BASE_URL. Friendly interface for users without advanced CLI experience.</description>
+        <windows_compatibility>Windows 10+</windows_compatibility>
+        <linux_compatibility>Linux (AppImage, glibc 2.28+)</linux_compatibility>
+        <win7_note>LM Studio requires Windows 10+. On Win7 use llama.cpp directly (S1.5).</win7_note>
+        <env_vars>
+          <var><name>ANTHROPIC_BASE_URL</name><value>http://localhost:1234/v1</value></var>
+          <var><name>ANTHROPIC_API_KEY</name><value>lmstudio</value></var>
+        </env_vars>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S1.3] Install LM Studio + Claude Code (Windows 10+)
+echo.
+echo Step 1: Download LM Studio from https://lmstudio.ai
+echo         and install manually (.exe installer)
+echo.
+echo Step 2: After installing LM Studio:
+echo         - Launch LM Studio
+echo         - Search and download: deepseek-coder-v3 (Q4_K_M)
+echo         - Enable 'Local Server' on port 1234
+echo.
+echo Step 3: Installing Node.js and Claude Code...
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+echo.
+echo Step 4: Setting environment variables...
+setx ANTHROPIC_BASE_URL "http://localhost:1234/v1" >nul
+setx ANTHROPIC_API_KEY "lmstudio" >nul
+echo.
+echo Done! Make sure LM Studio is running, then: claude
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+echo "[S1.3] Install LM Studio + Claude Code (Linux)"
+echo "Downloading LM Studio AppImage..."
+LMS_URL="https://releases.lmstudio.ai/linux/x86/0.3.15/LM-Studio-0.3.15-x86_64.AppImage"
+curl -L "$LMS_URL" -o ~/LMStudio.AppImage
+chmod +x ~/LMStudio.AppImage
+echo "LM Studio downloaded: ~/LMStudio.AppImage"
+echo "Launch: ~/LMStudio.AppImage"
+echo "Download deepseek-coder-v3 from the GUI, enable the local server."
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:1234/v1"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="lmstudio"' >> ~/.bashrc
+echo "Done! Launch LM Studio, enable server, then: source ~/.bashrc && claude"]]></script_install_linux_bash>
+        <status><free_type>unlimited-permanent</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S1_4">
+        <identifier>S1.4</identifier>
+        <title>Ollama + GLM-4.7:cloud (Free Ollama-Hosted)</title>
+        <description>Models with the :cloud suffix in Ollama v0.14+ run on Ollama's cloud
+          infrastructure, not on local hardware. GLM-4.7:cloud and MiniMax-M2.1:cloud
+          are free. Advantage: no GPU or large RAM needed locally.</description>
+        <env_vars>
+          <var><name>ANTHROPIC_BASE_URL</name><value>http://localhost:11434/v1</value></var>
+          <var><name>ANTHROPIC_API_KEY</name><value>ollama</value></var>
+        </env_vars>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S1.4] Ollama Cloud Models (GLM-4.7:cloud)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+ollama --version >nul 2>&1 || (
+  curl -L https://ollama.com/download/OllamaSetup.exe -o "%TEMP%\Ollama.exe"
+  start /wait "%TEMP%\Ollama.exe" /S & timeout /t 5 /nobreak >nul
+)
+echo Downloading cloud model reference (small, fast)...
+ollama pull glm4.7:cloud
+setx ANTHROPIC_BASE_URL "http://localhost:11434/v1" >nul
+setx ANTHROPIC_API_KEY "ollama" >nul
+echo Done! Run: claude --model glm4.7:cloud
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+command -v ollama &>/dev/null || curl -fsSL https://ollama.com/install.sh | sh
+ollama pull glm4.7:cloud
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="ollama"' >> ~/.bashrc
+echo "Done! source ~/.bashrc && claude --model glm4.7:cloud"]]></script_install_linux_bash>
+        <status><free_type>unlimited-local-with-external-data</free_type><rating>3/5</rating></status>
+      </solution>
+
+      <solution id="S1_5">
+        <identifier>S1.5</identifier>
+        <title>llama.cpp server + Qwen2.5-Coder-32B + Free Claude Code proxy</title>
+        <description>Maximum compatibility solution: llama.cpp works on Windows 7+
+          (Windows Vista), Linux kernel 3.0+. Free Claude Code proxy (Python, MIT,
+          20.9k stars) translates Claude Code calls to llama.cpp, LM Studio,
+          NVIDIA NIM, or Ollama. Best option for older systems.</description>
+        <extended_compatibility>Windows Vista SP2+, Windows 7+, Windows 8+, Windows 10+, Linux kernel 3.0+</extended_compatibility>
+        <win7_note>On Windows 7, the official Claude Code CLI (Node.js 18+) does NOT work.
+          Use the Free Claude Code proxy directly as a code terminal.</win7_note>
+        <win7_compatible>TRUE</win7_compatible>
+        <recommended_models>
+          <model>
+            <name>Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf</name>
+            <size_gb>4.4</size_gb>
+            <ram_min_gb>8</ram_min_gb>
+            <url>https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF</url>
+          </model>
+          <model>
+            <name>Qwen2.5-Coder-32B-Instruct-Q4_K_M.gguf</name>
+            <size_gb>18</size_gb>
+            <ram_min_gb>24</ram_min_gb>
+            <url>https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct-GGUF</url>
+          </model>
+        </recommended_models>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal enabledelayedexpansion
+echo [S1.5] Install llama.cpp + Free Claude Code (Windows 7+)
+echo NOTE: This solution works on Windows 7+
+
+:: --- Check Python 3.8+ ---
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo Python is not installed.
+  echo Download Python 3.8 from https://python.org/downloads/release/python-380/
+  echo and install with 'Add Python to PATH' checked.
+  echo After installation, restart CMD and run this script again.
+  pause & exit /b 1
+)
+for /f "tokens=2" %%v in ('python --version 2^>^&1') do set PYVER=%%v
+echo Python !PYVER! found: OK
+
+:: --- Install Free Claude Code proxy ---
+echo Installing Free Claude Code proxy...
+python -m pip install free-claude-code
+if %errorlevel% neq 0 (
+  echo Trying pip3...
+  pip3 install free-claude-code
+)
+
+:: --- Download llama.cpp ---
+echo.
+echo Downloading precompiled llama.cpp for Windows...
+curl -L "https://github.com/ggml-org/llama.cpp/releases/latest/download/llama-win-x64.zip" -o "%TEMP%\llama.zip" 2>nul
+if %errorlevel% neq 0 (
+  echo WARNING: Download manually from:
+  echo https://github.com/ggml-org/llama.cpp/releases
+  echo and extract to C:\llama.cpp\
+)
+
+:: --- Model instructions ---
+echo.
+echo ============================================================
+echo  NEXT STEP: Download a GGUF model from HuggingFace
+echo  Recommended: Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf (~4.4GB)
+echo  URL: https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF
+echo ============================================================
+echo.
+echo  After downloading the model, start the llama.cpp server:
+echo  llama-server.exe -m "path\to\model.gguf" --port 8080 -ngl 99
+echo.
+echo  Then configure Free Claude Code:
+echo  free-claude-code config --provider llama.cpp --port 8080
+echo.
+echo  And use:
+echo  free-claude-code
+echo ============================================================
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+echo "[S1.5] Install llama.cpp + Free Claude Code (Linux)"
+
+# Python
+command -v python3 &>/dev/null || sudo apt-get install -y python3 python3-pip 2>/dev/null || sudo dnf install -y python3 python3-pip
+
+# Free Claude Code proxy
+pip3 install free-claude-code || pip3 install free-claude-code --break-system-packages
+
+# llama.cpp - compile from source or download prebuilt
+if command -v cmake &>/dev/null && command -v make &>/dev/null; then
+  echo "Compiling llama.cpp from source..."
+  cd /tmp
+  git clone --depth=1 https://github.com/ggml-org/llama.cpp.git
+  cd llama.cpp
+  mkdir build && cd build
+  # Detect CUDA
+  if command -v nvcc &>/dev/null; then
+    cmake .. -DLLAMA_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+  else
+    cmake .. -DLLAMA_NATIVE=ON -DCMAKE_BUILD_TYPE=Release
+  fi
+  make -j$(nproc)
+  sudo cp bin/llama-server /usr/local/bin/
+  echo "llama-server compiled and installed to /usr/local/bin/"
+else
+  echo "cmake/make missing. Install: sudo apt-get install -y cmake build-essential"
+  echo "Or download prebuilt binary from:"
+  echo "https://github.com/ggml-org/llama.cpp/releases"
+fi
+
+echo ""
+echo "Download a GGUF model:"
+echo "  wget https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf"
+echo ""
+echo "Start the server:"
+echo "  llama-server -m model.gguf --port 8080 -ngl 99 &"
+echo ""
+echo "Configure proxy:"
+echo "  free-claude-code config --provider llama.cpp --port 8080"
+echo ""
+echo "Use:"
+echo "  free-claude-code"]]></script_install_linux_bash>
+        <status><free_type>unlimited-permanent</free_type><win7_compatible>true</win7_compatible><rating>4/5</rating></status>
+      </solution>
+    </tier>
+
+    <!-- ============================================================
+         TIER 2 — FREE CLOUD, DAILY LIMITS
+         ============================================================ -->
+    <tier id="2" type="free-cloud-daily-limits" label="Free Cloud — Daily Limits">
+
+      <solution id="S2_1">
+        <identifier>S2.1</identifier>
+        <title>Claude Code Router + OpenRouter (30+ free models)</title>
+        <description>claude-code-router (npm, MIT, 30k+ stars) + OpenRouter free tier (30+ :free models).
+          With $5-10 deposited (unspent, free models cost nothing) the limit permanently
+          increases from 50 to 1000 req/day.</description>
+        <url_openrouter>https://openrouter.ai</url_openrouter>
+        <free_models_openrouter>
+          <model>meta-llama/llama-3.3-70b-instruct:free</model>
+          <model>google/gemini-2.0-flash-exp:free</model>
+          <model>deepseek/deepseek-chat:free</model>
+          <model>mistralai/mistral-7b-instruct:free</model>
+        </free_models_openrouter>
+        <limits><req_day_no_deposit>50</req_day_no_deposit><req_day_with_5usd_deposit>1000</req_day_with_5usd_deposit></limits>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "OR_KEY=%~1"
+if "%OR_KEY%"=="" (echo Usage: install_s2_1.bat sk-or-YOUR_KEY & pause & exit /b 1)
+echo [S2.1] Claude Code Router + OpenRouter
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+npm install -g @musistudio/claude-code-router
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {"providers":{"openrouter":{"apiKey":"%OR_KEY%","baseUrl":"https://openrouter.ai/api/v1"}},
+echo "Router":{"default":"openrouter,meta-llama/llama-3.3-70b-instruct:free"}}
+) > "%APPDATA%\claude-code-router\config.json"
+echo Done! Run: ccr code
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+OR_KEY="${1:?'Usage: bash install_s2_1.sh sk-or-YOUR_KEY'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << EOF
+{"providers":{"openrouter":{"apiKey":"${OR_KEY}","baseUrl":"https://openrouter.ai/api/v1"}},
+ "Router":{"default":"openrouter,meta-llama/llama-3.3-70b-instruct:free"}}
+EOF
+echo "Done! ccr code"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S2_2">
+        <identifier>S2.2</identifier>
+        <title>Claude Code Router + Gemini 2.0 Flash Exp (Google AI Studio)</title>
+        <description>Google AI Studio provides free access to Gemini 2.0 Flash Experimental.
+          Limits reduced 50-80% in Dec 2025. ~150 requests/day.</description>
+        <url_api_key>https://aistudio.google.com/apikey</url_api_key>
+        <model>gemini-2.0-flash-exp</model>
+        <warning>Google reduced free tier limits by 50-80% in December 2025.</warning>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "GEMINI_KEY=%~1"
+if "%GEMINI_KEY%"=="" (echo Usage: install_s2_2.bat AIza... & pause & exit /b 1)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {"providers":{"gemini":{"apiKey":"%GEMINI_KEY%","baseUrl":"https://generativelanguage.googleapis.com/v1beta/openai"}},
+echo "Router":{"default":"gemini,gemini-2.0-flash-exp"}}
+) > "%APPDATA%\claude-code-router\config.json"
+echo Done! Run: ccr code
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+GEMINI_KEY="${1:?'Usage: bash install_s2_2.sh AIza...'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << EOF
+{"providers":{"gemini":{"apiKey":"${GEMINI_KEY}","baseUrl":"https://generativelanguage.googleapis.com/v1beta/openai"}},
+ "Router":{"default":"gemini,gemini-2.0-flash-exp"}}
+EOF
+echo "Done! ccr code"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><limit_day>~150</limit_day><rating>3/5</rating></status>
+      </solution>
+
+      <solution id="S2_3">
+        <identifier>S2.3</identifier>
+        <title>Claude Code Router + Groq GroqCloud (ultra-fast inference)</title>
+        <description>GroqCloud LPU hardware — fastest publicly available inference (~2000 tok/sec).
+          Free tier: 30 req/min, 14,400 req/day for Llama 3.3 70B.</description>
+        <url_api_key>https://console.groq.com/keys</url_api_key>
+        <recommended_model>llama-3.3-70b-versatile</recommended_model>
+        <limits><req_min>30</req_min><req_day>14400</req_day></limits>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "GROQ_KEY=%~1"
+if "%GROQ_KEY%"=="" (echo Usage: install_s2_3.bat gsk_... & pause & exit /b 1)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {"providers":{"groq":{"apiKey":"%GROQ_KEY%","baseUrl":"https://api.groq.com/openai/v1"}},
+echo "Router":{"default":"groq,llama-3.3-70b-versatile"}}
+) > "%APPDATA%\claude-code-router\config.json"
+echo Done! Run: ccr code
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+GROQ_KEY="${1:?'Usage: bash install_s2_3.sh gsk_...'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << EOF
+{"providers":{"groq":{"apiKey":"${GROQ_KEY}","baseUrl":"https://api.groq.com/openai/v1"}},
+ "Router":{"default":"groq,llama-3.3-70b-versatile"}}
+EOF
+echo "Done! ccr code"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><limit_day>14400</limit_day><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S2_4">
+        <identifier>S2.4</identifier>
+        <title>Claude Code Router + NVIDIA NIM (free endpoints)</title>
+        <description>NVIDIA NIM provides 1000 free credits on registration for large models:
+          Llama 3.1 405B, Nemotron-4 340B, Mixtral 8x22B.</description>
+        <url_api_key>https://build.nvidia.com</url_api_key>
+        <recommended_model>meta/llama-3.1-405b-instruct</recommended_model>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "NV_KEY=%~1"
+if "%NV_KEY%"=="" (echo Usage: install_s2_4.bat nvapi-... & pause & exit /b 1)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {"providers":{"nvidia":{"apiKey":"%NV_KEY%","baseUrl":"https://integrate.api.nvidia.com/v1"}},
+echo "Router":{"default":"nvidia,meta/llama-3.1-405b-instruct"}}
+) > "%APPDATA%\claude-code-router\config.json"
+echo Done! Run: ccr code
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+NV_KEY="${1:?'Usage: bash install_s2_4.sh nvapi-...'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << EOF
+{"providers":{"nvidia":{"apiKey":"${NV_KEY}","baseUrl":"https://integrate.api.nvidia.com/v1"}},
+ "Router":{"default":"nvidia,meta/llama-3.1-405b-instruct"}}
+EOF
+echo "Done! ccr code"]]></script_install_linux_bash>
+        <status><free_type>initial-credit-limits</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S2_5">
+        <identifier>S2.5</identifier>
+        <title>OpenCode + OpenRouter (no separate router)</title>
+        <description>OpenCode is an open-source Claude Code alternative with native support
+          for 75+ providers. /connect and /models directly in terminal.</description>
+        <url_opencode>https://npmjs.com/package/opencode-ai</url_opencode>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S2.5] Install OpenCode + OpenRouter
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g opencode-ai
+echo.
+echo Done! Launch OpenCode and connect OpenRouter:
+echo   opencode
+echo   /connect openrouter
+echo   (enter API key from openrouter.ai)
+echo   /models
+echo   (select google/gemini-2.0-flash-exp:free or similar)
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g opencode-ai
+echo "Done! Run: opencode"
+echo "In session: /connect openrouter → enter API key → /models → select :free model"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S2_6">
+        <identifier>S2.6</identifier>
+        <title>OpenCode + Cerebras (free tier, ~2000 tok/sec)</title>
+        <limits><req_min>60</req_min><tokens_min>30000</tokens_min></limits>
+        <url_api_key>https://cloud.cerebras.ai</url_api_key>
+        <script_install_windows_bat><![CDATA[@echo off
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g opencode-ai
+echo Done! opencode -> /connect cerebras -> /models -> llama-3.3-70b
+pause]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g opencode-ai
+echo "opencode → /connect cerebras → /models → llama-3.3-70b"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S2_7">
+        <identifier>S2.7</identifier>
+        <title>OpenCode + Hugging Face Inference (free tier)</title>
+        <url_token>https://huggingface.co/settings/tokens</url_token>
+        <note>Verify tool-use compatibility for the chosen model.</note>
+        <script_install_windows_bat><![CDATA[@echo off
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g opencode-ai
+echo Done! opencode -> /connect huggingface -> /models -> Qwen/Qwen2.5-Coder-32B-Instruct
+pause]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g opencode-ai
+echo "opencode → /connect huggingface → HF token → /models"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><rating>3/5</rating></status>
+      </solution>
+
+      <solution id="S2_8">
+        <identifier>S2.8</identifier>
+        <title>LiteLLM Local Proxy + multi-provider free routing (WINDOWS 7+ COMPATIBLE)</title>
+        <description>LiteLLM (Python 3.8+) runs a local proxy aggregating all free providers.
+          Windows 7 SP1+ compatible. Automatic fallback between providers.
+          Claude Code connects to a single local endpoint.</description>
+        <win7_compatible>TRUE — Python 3.8 supports Windows Vista SP2+</win7_compatible>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal enabledelayedexpansion
+echo [S2.8] LiteLLM Proxy (Windows 7+ compatible)
+
+:: Check Python
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo ERROR: Python is not installed.
+  echo Download Python 3.8+ from https://python.org/downloads/
+  echo IMPORTANT: Check 'Add Python to PATH' during installation!
+  pause & exit /b 1
+)
+echo Python found: OK
+
+:: Install LiteLLM
+echo Installing LiteLLM proxy...
+python -m pip install "litellm[proxy]"
+
+:: Create config.yaml
+set "CONFIG_DIR=%USERPROFILE%\.litellm"
+if not exist "%CONFIG_DIR%" mkdir "%CONFIG_DIR%"
+
+(
+echo model_list:
+echo   - model_name: llama-free
+echo     litellm_params:
+echo       model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+echo       api_key: sk-or-REPLACE_WITH_KEY
+echo   - model_name: gemini-free
+echo     litellm_params:
+echo       model: gemini/gemini-2.0-flash-exp
+echo       api_key: AIza-REPLACE_WITH_KEY
+echo   - model_name: groq-llama
+echo     litellm_params:
+echo       model: groq/llama-3.3-70b-versatile
+echo       api_key: gsk-REPLACE_WITH_KEY
+echo router_settings:
+echo   num_retries: 3
+echo   fallbacks:
+echo     - llama-free:
+echo         - gemini-free
+echo         - groq-llama
+) > "%CONFIG_DIR%\config.yaml"
+
+echo.
+echo Config created: %CONFIG_DIR%\config.yaml
+echo Edit the file and add your API keys!
+echo.
+echo Start proxy:
+echo   python -m litellm --port 4000 --config "%CONFIG_DIR%\config.yaml"
+echo.
+echo Set Claude Code (new CMD):
+echo   setx ANTHROPIC_BASE_URL "http://localhost:4000"
+echo   setx ANTHROPIC_API_KEY "sk-fake-key"
+echo.
+echo Usage:
+echo   claude
+pause & endlocal]]></script_install_windows_bat>
+        <script_start_proxy_windows_bat><![CDATA[@echo off
+echo Starting LiteLLM proxy on port 4000...
+python -m litellm --port 4000 --config "%USERPROFILE%\.litellm\config.yaml"]]></script_start_proxy_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+echo "[S2.8] LiteLLM Proxy (Linux)"
+
+# Python
+command -v python3 &>/dev/null || sudo apt-get install -y python3 python3-pip 2>/dev/null || sudo dnf install -y python3 python3-pip
+
+# LiteLLM
+pip3 install "litellm[proxy]" 2>/dev/null || pip3 install "litellm[proxy]" --break-system-packages
+
+# Config
+mkdir -p ~/.litellm
+cat > ~/.litellm/config.yaml << 'YAMLEOF'
+model_list:
+  - model_name: llama-free
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+      api_key: sk-or-REPLACE_WITH_KEY
+  - model_name: gemini-free
+    litellm_params:
+      model: gemini/gemini-2.0-flash-exp
+      api_key: AIza-REPLACE_WITH_KEY
+  - model_name: groq-llama
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: gsk-REPLACE_WITH_KEY
+router_settings:
+  num_retries: 3
+  fallbacks:
+    - llama-free: [gemini-free, groq-llama]
+YAMLEOF
+
+echo "Edit: ~/.litellm/config.yaml"
+echo ""
+echo "Start proxy: python3 -m litellm --port 4000 --config ~/.litellm/config.yaml &"
+echo ""
+echo "Set Claude Code:"
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:4000"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="sk-fake-key"' >> ~/.bashrc
+echo "ANTHROPIC_BASE_URL / ANTHROPIC_API_KEY added to ~/.bashrc"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><win7_compatible>true</win7_compatible><rating>5/5</rating></status>
+      </solution>
+
+      <solution id="S2_9">
+        <identifier>S2.9</identifier>
+        <title>claude-code-proxy (Python) + intelligent routing</title>
+        <description>Simpler Python proxy (3.3k stars). Translates Anthropic calls to
+          OpenAI/Gemini format via LiteLLM. Windows 7+ compatible via Python 3.8.</description>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "OR_KEY=%~1"
+if "%OR_KEY%"=="" (echo Usage: install_s2_9.bat sk-or-YOUR_KEY & pause & exit /b 1)
+python --version >nul 2>&1 || (echo Install Python from python.org & pause & exit /b 1)
+python -m pip install claude-code-proxy
+echo.
+echo Start proxy:
+echo   ccp --provider openrouter --api-key %OR_KEY% --port 8082
+echo.
+echo Set (new CMD):
+echo   setx ANTHROPIC_BASE_URL "http://localhost:8082"
+echo   setx ANTHROPIC_API_KEY "sk-fake"
+echo.
+echo Usage: claude
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+OR_KEY="${1:?'Usage: bash install_s2_9.sh sk-or-...'}"
+pip3 install claude-code-proxy 2>/dev/null || pip3 install claude-code-proxy --break-system-packages
+echo "Start: ccp --provider openrouter --api-key ${OR_KEY} --port 8082 &"
+echo "Set: export ANTHROPIC_BASE_URL=http://localhost:8082 && export ANTHROPIC_API_KEY=sk-fake"]]></script_install_linux_bash>
+        <status><free_type>daily-limits</free_type><win7_compatible>true</win7_compatible><rating>3/5</rating></status>
+      </solution>
+
+      <solution id="S2_10">
+        <identifier>S2.10</identifier>
+        <title>Hybrid routing: Ollama local + OpenRouter cloud (advanced)</title>
+        <description>Advanced configuration: private projects → Ollama local (zero external data),
+          public projects → OpenRouter free (cloud). Auto or manual switching with /model.</description>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+set "OR_KEY=%~1"
+if "%OR_KEY%"=="" (echo Usage: install_s2_10.bat sk-or-YOUR_KEY & pause & exit /b 1)
+echo [S2.10] Hybrid routing Ollama + OpenRouter
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+ollama --version >nul 2>&1 || (
+  curl -L https://ollama.com/download/OllamaSetup.exe -o "%TEMP%\Ollama.exe"
+  start /wait "%TEMP%\Ollama.exe" /S & timeout /t 5 /nobreak >nul
+)
+ollama pull qwen3-coder
+if not exist "%APPDATA%\claude-code-router" mkdir "%APPDATA%\claude-code-router"
+(
+echo {
+echo   "providers": {
+echo     "ollama": {"baseUrl": "http://localhost:11434/api","type": "ollama"},
+echo     "openrouter": {"apiKey": "%OR_KEY%","baseUrl": "https://openrouter.ai/api/v1"}
+echo   },
+echo   "Router": {
+echo     "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+echo     "private": "ollama,qwen3-coder",
+echo     "background": "openrouter,deepseek/deepseek-chat:free"
+echo   }
+echo }
+) > "%APPDATA%\claude-code-router\config.json"
+setx ANTHROPIC_BASE_URL "http://localhost:11434/v1" >nul
+setx ANTHROPIC_API_KEY "ollama" >nul
+echo Done! Run: ccr code
+echo In session: /model qwen3-coder (local) or /model llama-3.3-70b:free (cloud)
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+set -e
+OR_KEY="${1:?'Usage: bash install_s2_10.sh sk-or-...'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router
+command -v ollama &>/dev/null || curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen3-coder
+mkdir -p ~/.claude-code-router
+cat > ~/.claude-code-router/config.json << EOF
+{
+  "providers": {
+    "ollama": {"baseUrl": "http://localhost:11434/api","type": "ollama"},
+    "openrouter": {"apiKey": "${OR_KEY}","baseUrl": "https://openrouter.ai/api/v1"}
+  },
+  "Router": {
+    "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+    "private": "ollama,qwen3-coder",
+    "background": "openrouter,deepseek/deepseek-chat:free"
+  }
+}
+EOF
+grep -q ANTHROPIC_BASE_URL ~/.bashrc || echo 'export ANTHROPIC_BASE_URL="http://localhost:11434/v1"' >> ~/.bashrc
+grep -q ANTHROPIC_API_KEY  ~/.bashrc || echo 'export ANTHROPIC_API_KEY="ollama"' >> ~/.bashrc
+echo "Done! source ~/.bashrc && ccr code"]]></script_install_linux_bash>
+        <status><free_type>hybrid-unlimited-local-plus-cloud-limits</free_type><rating>5/5</rating></status>
+      </solution>
+    </tier>
+
+    <!-- ============================================================
+         TIER 3 — FREE CREDITS, TEMPORARY
+         ============================================================ -->
+    <tier id="3" type="temporary-credits" label="Free Credits — Temporary">
+
+      <solution id="S3_1">
+        <identifier>S3.1</identifier>
+        <title>Anthropic Open Source Program — Claude Max 20x, 6 months free</title>
+        <description>Open-source project maintainers receive Claude Max 20x ($200/month)
+          free for 6 months = $1,200 total value. Access to Claude Opus 4.6.</description>
+        <url>https://www.anthropic.com/programs/open-source</url>
+        <total_value_usd>1200</total_value_usd>
+        <duration_months>6</duration_months>
+        <requirements>Active open-source project on GitHub/GitLab with contributors and activity.</requirements>
+        <script_configure_windows_bat><![CDATA[@echo off
+setlocal
+set "ANT_KEY=%~1"
+if "%ANT_KEY%"=="" (echo Usage: setup_s3_1.bat sk-ant-YOUR_KEY & pause & exit /b 1)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+setx ANTHROPIC_API_KEY "%ANT_KEY%" >nul
+echo Done! Run: claude
+echo Using Claude Max with Anthropic API key.
+pause & endlocal]]></script_configure_windows_bat>
+        <script_configure_linux_bash><![CDATA[#!/bin/bash
+set -e
+ANT_KEY="${1:?'Usage: bash setup_s3_1.sh sk-ant-...'}"
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+grep -q ANTHROPIC_API_KEY ~/.bashrc || echo "export ANTHROPIC_API_KEY=\"${ANT_KEY}\"" >> ~/.bashrc
+export ANTHROPIC_API_KEY="${ANT_KEY}"
+echo "Done! claude"]]></script_configure_linux_bash>
+        <status><free_type>temporary-6-months</free_type><rating>5/5 (if eligible)</rating></status>
+      </solution>
+
+      <solution id="S3_2">
+        <identifier>S3.2</identifier>
+        <title>Google Cloud for Startups — $300 credits (90 days) + Vertex AI</title>
+        <description>New Google Cloud accounts receive $300 credits (90 days). Claude available
+          on Vertex AI. Claude Code natively supports Vertex AI.</description>
+        <url>https://cloud.google.com/free</url>
+        <value_usd>300</value_usd>
+        <duration_days>90</duration_days>
+        <script_configure_windows_bat><![CDATA[@echo off
+setlocal
+echo [S3.2] Configure Claude Code with Google Vertex AI
+echo.
+echo Step 1: Activate Google Cloud free trial at https://cloud.google.com/free
+echo Step 2: Enable Vertex AI API from Console
+echo Step 3: Download gcloud CLI from https://cloud.google.com/sdk/docs/install
+echo.
+echo After installing gcloud, continue with this script:
+echo.
+
+gcloud --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo gcloud CLI is not installed. Install it first!
+  pause & exit /b 1
+)
+
+echo Authenticating gcloud...
+gcloud auth application-default login
+
+set /p PROJECT_ID=Enter Google Cloud Project ID:
+set /p REGION=Enter Region (e.g. us-east5):
+
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+setx ANTHROPIC_VERTEX_PROJECT_ID "%PROJECT_ID%" >nul
+setx ANTHROPIC_VERTEX_REGION "%REGION%" >nul
+
+echo Done! Run: claude --vertex
+pause & endlocal]]></script_configure_windows_bat>
+        <script_configure_linux_bash><![CDATA[#!/bin/bash
+set -e
+PROJECT_ID="${1:?'Usage: bash setup_s3_2.sh PROJECT_ID [REGION]'}"
+REGION="${2:-us-east5}"
+
+command -v gcloud &>/dev/null || {
+  curl https://sdk.cloud.google.com | bash
+  exec -l $SHELL
+}
+gcloud auth application-default login
+
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+
+grep -q ANTHROPIC_VERTEX_PROJECT_ID ~/.bashrc || echo "export ANTHROPIC_VERTEX_PROJECT_ID=\"${PROJECT_ID}\"" >> ~/.bashrc
+grep -q ANTHROPIC_VERTEX_REGION ~/.bashrc || echo "export ANTHROPIC_VERTEX_REGION=\"${REGION}\"" >> ~/.bashrc
+export ANTHROPIC_VERTEX_PROJECT_ID="${PROJECT_ID}"
+export ANTHROPIC_VERTEX_REGION="${REGION}"
+echo "Done! claude --vertex"]]></script_configure_linux_bash>
+        <status><free_type>temporary-90-days</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S3_3">
+        <identifier>S3.3</identifier>
+        <title>AWS Activate / Amazon Bedrock — startup credits</title>
+        <description>AWS Activate: $1,000+ credits (public portal, no strict requirements).
+          Claude available on Amazon Bedrock. Claude Code natively supports Bedrock.</description>
+        <url>https://aws.amazon.com/activate</url>
+        <min_value_usd>1000</min_value_usd>
+        <script_configure_windows_bat><![CDATA[@echo off
+setlocal
+echo [S3.3] Configure Claude Code with Amazon Bedrock
+
+aws --version >nul 2>&1
+if %errorlevel% neq 0 (
+  echo AWS CLI is not installed.
+  echo Download from https://aws.amazon.com/cli/
+  echo Install and restart CMD.
+  pause & exit /b 1
+)
+
+echo Configuring AWS CLI...
+aws configure
+
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+setx ANTHROPIC_BEDROCK_REGION "us-east-1" >nul
+
+echo Done! Run: claude --bedrock
+pause & endlocal]]></script_configure_windows_bat>
+        <script_configure_linux_bash><![CDATA[#!/bin/bash
+set -e
+AWS_REGION="${1:-us-east-1}"
+
+command -v aws &>/dev/null || {
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+  unzip /tmp/awscliv2.zip -d /tmp/aws-cli
+  sudo /tmp/aws-cli/aws/install
+}
+aws configure
+
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+
+grep -q ANTHROPIC_BEDROCK_REGION ~/.bashrc || echo "export ANTHROPIC_BEDROCK_REGION=\"${AWS_REGION}\"" >> ~/.bashrc
+export ANTHROPIC_BEDROCK_REGION="${AWS_REGION}"
+echo "Done! claude --bedrock"]]></script_configure_linux_bash>
+        <status><free_type>temporary-credits</free_type><rating>4/5</rating></status>
+      </solution>
+
+      <solution id="S3_4">
+        <identifier>S3.4</identifier>
+        <title>New Anthropic API account — ~$5 initial credits</title>
+        <description>New accounts on platform.claude.com automatically receive ~$5 in API credits
+          with no credit card required. Enough for 3-5 medium Claude Code sessions with Sonnet.</description>
+        <url>https://platform.claude.com</url>
+        <value_usd>~5</value_usd>
+        <tip>Use claude-haiku-4-5-20251001 to stretch credits (10x cheaper).</tip>
+        <script_configure_windows_bat><![CDATA[@echo off
+setlocal
+set "ANT_KEY=%~1"
+if "%ANT_KEY%"=="" (
+  echo Get API key from https://platform.claude.com
+  echo New account receives ~$5 free credits.
+  set /p ANT_KEY=Enter API key (sk-ant-...):
+)
+node --version >nul 2>&1 || winget install OpenJS.NodeJS.LTS -e --silent
+npm install -g @anthropic-ai/claude-code
+setx ANTHROPIC_API_KEY "%ANT_KEY%" >nul
+echo Done! claude
+echo TIP: Use Haiku model to save credits:
+echo   claude --model claude-haiku-4-5-20251001
+pause & endlocal]]></script_configure_windows_bat>
+        <script_configure_linux_bash><![CDATA[#!/bin/bash
+set -e
+ANT_KEY="${1:-}"
+if [ -z "$ANT_KEY" ]; then
+  echo "Get API key from https://platform.claude.com"
+  read -rp "Enter API key (sk-ant-...): " ANT_KEY
+fi
+command -v node &>/dev/null || { curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -; sudo apt-get install -y nodejs; }
+npm install -g @anthropic-ai/claude-code
+grep -q ANTHROPIC_API_KEY ~/.bashrc || echo "export ANTHROPIC_API_KEY=\"${ANT_KEY}\"" >> ~/.bashrc
+export ANTHROPIC_API_KEY="${ANT_KEY}"
+echo "Done! claude"
+echo "TIP: claude --model claude-haiku-4-5-20251001 (cheapest)"]]></script_configure_linux_bash>
+        <status><free_type>temporary-initial-credits</free_type><value_usd>5</value_usd><rating>2/5 (limited)</rating></status>
+      </solution>
+
+      <solution id="S3_5">
+        <identifier>S3.5</identifier>
+        <title>Anthropic Batch API — 50% cost reduction (programmatic)</title>
+        <description>Batch API offers 50% discount. Not used directly with Claude Code CLI,
+          but programmatically via Python/JavaScript SDK for bulk tasks.</description>
+        <typical_use>Bulk code analysis, automated documentation, large repo refactoring, CI/CD</typical_use>
+        <discount_percent>50</discount_percent>
+        <python_example><![CDATA[from anthropic import Anthropic
+client = Anthropic()
+
+requests = [
+    {
+        "custom_id": "review-file-1",
+        "params": {
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 2000,
+            "messages": [{"role": "user", "content": "Review this code: ..."}]
+        }
+    }
+]
+
+batch = client.beta.messages.batches.create(requests=requests)
+print(f"Batch ID: {batch.id}")
+
+# Check results
+result = client.beta.messages.batches.retrieve(batch.id)
+print(f"Status: {result.processing_status}")]]></python_example>
+        <script_install_windows_bat><![CDATA[@echo off
+setlocal
+echo [S3.5] Install Anthropic Python SDK (Batch API)
+python --version >nul 2>&1 || (echo Install Python from python.org & pause & exit /b 1)
+python -m pip install anthropic
+echo Anthropic Python SDK installed.
+echo Use programmatically via: from anthropic import Anthropic
+pause & endlocal]]></script_install_windows_bat>
+        <script_install_linux_bash><![CDATA[#!/bin/bash
+pip3 install anthropic 2>/dev/null || pip3 install anthropic --break-system-packages
+echo "Anthropic Python SDK installed. Use: from anthropic import Anthropic"]]></script_install_linux_bash>
+        <status><free_type>cost-reduction</free_type><rating>3/5</rating></status>
+      </solution>
+    </tier>
+
+  </solutions>
+
+  <!-- ============================================================
+       COMPATIBILITY NOTES
+       ============================================================ -->
+  <compatibility_notes>
+
+    <note id="NC1" title="Windows 7 and Windows 8 — Critical Limitations">
+      <description>Official Claude Code CLI (@anthropic-ai/claude-code) requires Node.js 18+
+        which does not support Windows 7/8. Ollama requires Windows 10+.
+        LM Studio requires Windows 10+.</description>
+      <compatible_solutions_win7>
+        <solution ref="S1_5">llama.cpp + Free Claude Code proxy (Python 3.8)</solution>
+        <solution ref="S2_8">LiteLLM Proxy (Python 3.8+)</solution>
+        <solution ref="S2_9">claude-code-proxy (Python)</solution>
+      </compatible_solutions_win7>
+    </note>
+
+    <note id="NC2" title="Node.js — Version Compatibility">
+      <version major="18" compatible_with="Windows 8.1+" linux_kernel="3.10+"/>
+      <version major="20" compatible_with="Windows 10+" linux_kernel="4.4+"/>
+      <version major="22" compatible_with="Windows 10+" linux_kernel="4.4+"/>
+    </note>
+
+    <note id="NC3" title="Python — Version Compatibility">
+      <version minor="3.8" compatible_with="Windows Vista SP2+, Windows 7 SP1+"/>
+      <version minor="3.9-3.12" compatible_with="Windows 8+"/>
+      <version minor="3.13+" compatible_with="Windows 10+"/>
+    </note>
+
+    <note id="NC4" title="GPU — Acceleration Support">
+      <gpu type="NVIDIA_CUDA">
+        <windows_min_driver>452.39</windows_min_driver>
+        <linux_min_driver>450.51</linux_min_driver>
+        <cuda_min_version>11.0</cuda_min_version>
+      </gpu>
+      <gpu type="AMD_ROCm">
+        <linux_kernel_min>5.4</linux_kernel_min>
+        <note>Experimental Windows support</note>
+      </gpu>
+      <gpu type="CPU_only">
+        <note>Works on any hardware, slower by a factor of 5-20x</note>
+      </gpu>
+    </note>
+
+    <note id="NC5" title="Ollama — Version Compatibility">
+      <version min_for_anthropic_api="0.14" date="2026-01-16"/>
+      <os_min_windows>Windows 10</os_min_windows>
+      <kernel_min_linux>4.0</kernel_min_linux>
+    </note>
+
+  </compatibility_notes>
+
+  <!-- ============================================================
+       COMPARISON MATRIX
+       ============================================================ -->
+  <comparison_matrix>
+    <criterion id="MC1" name="Completely free and unlimited" type="boolean">
+      <solution ref="T0" value="partial">Local YES, cloud partial</solution>
+      <solution ref="S1_1" value="true"/>
+      <solution ref="S1_2" value="true"/>
+      <solution ref="S1_3" value="true"/>
+      <solution ref="S1_4" value="partial">Ollama cloud — requires internet</solution>
+      <solution ref="S1_5" value="true"/>
+      <solution ref="S2_1" value="partial">50-1000 req/day</solution>
+      <solution ref="S2_8" value="partial">Depends on providers</solution>
+    </criterion>
+    <criterion id="MC2" name="Windows 7 compatible" type="boolean">
+      <solution ref="S1_5" value="true"/>
+      <solution ref="S2_8" value="true"/>
+      <solution ref="S2_9" value="true"/>
+    </criterion>
+    <criterion id="MC3" name="Requires GPU" type="boolean">
+      <solution ref="S1_1" value="false">GPU optional, significant acceleration</solution>
+      <solution ref="S1_2" value="false">Powerful GPU strongly recommended for 27B</solution>
+    </criterion>
+    <criterion id="MC4" name="Private data (zero external upload)" type="boolean">
+      <solution ref="S1_1" value="true"/>
+      <solution ref="S1_2" value="true"/>
+      <solution ref="S1_3" value="true"/>
+      <solution ref="S1_5" value="true"/>
+      <solution ref="S2_1" value="false"/>
+      <solution ref="S2_10" value="partial">Local for sensitive data</solution>
+    </criterion>
+    <criterion id="MC5" name="Requires internet" type="boolean">
+      <solution ref="S1_1" value="false"/>
+      <solution ref="S1_2" value="false"/>
+      <solution ref="S1_3" value="false"/>
+      <solution ref="S1_4" value="true"/>
+      <solution ref="S1_5" value="false"/>
+      <solution ref="S2_1" value="true"/>
+      <solution ref="S2_8" value="true"/>
+    </criterion>
+  </comparison_matrix>
+
+</ontology>

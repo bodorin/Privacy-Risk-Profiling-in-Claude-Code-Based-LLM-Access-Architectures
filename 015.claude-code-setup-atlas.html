@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Claude Code Setup Atlas - Companion Resource for: Privacy Risk Profiling in Claude Code-Based LLM Access Architectures - A Systematic Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field manual. Sticky index on the left, one card per configuration on the right,
+   every card colour-coded by the paper's exposure class. One OS switch drives every code block. */
+:root{
+  --bg:#F2F4F6; --surface:#FFFFFF; --ink:#15202A; --muted:#566371; --line:#D9E0E6;
+  --accent:#0A6A8F; --code:#EBF0F3; --code-ink:#15202A; --warn:#8A5A00; --warn-bg:#FFF4DC;
+  --local:#1C7A4C; --hybrid:#A86200; --cloud:#3A55C8; --paid:#AA3466; --excl:#69737D;
+  --f-display:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D1318; --surface:#141C23; --ink:#E2E8ED; --muted:#93A1AD; --line:#26323C;
+  --accent:#55B6DD; --code:#0A0F13; --code-ink:#D9E2E8; --warn:#F2C66D; --warn-bg:#2A2312;
+  --local:#4CC38A; --hybrid:#EFA63C; --cloud:#93A6FF; --paid:#F07EAB; --excl:#9BA5AF; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0D1318; --surface:#141C23; --ink:#E2E8ED; --muted:#93A1AD; --line:#26323C;
+  --accent:#55B6DD; --code:#0A0F13; --code-ink:#D9E2E8; --warn:#F2C66D; --warn-bg:#2A2312;
+  --local:#4CC38A; --hybrid:#EFA63C; --cloud:#93A6FF; --paid:#F07EAB; --excl:#9BA5AF; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 48px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto}
+header.top{padding-block:40px 24px;display:grid;gap:14px;border-bottom:1px solid var(--line)}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(34px,5.4vw,58px)/0.98 var(--f-display);font-stretch:82%;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.lede{max-width:68ch;margin:0;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.chip{--c:var(--excl);display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);
+  background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);border-radius:999px;padding:3px 10px;
+  font:600 12px/1.4 var(--f-body);white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.c-local{--c:var(--local)} .c-hybrid{--c:var(--hybrid)} .c-cloud{--c:var(--cloud)} .c-paid{--c:var(--paid)} .c-excl{--c:var(--excl)}
+button.chip{cursor:pointer}
+button.chip[aria-pressed="false"]{opacity:.45;background:transparent}
+
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:32px;padding-top:24px;align-items:start}
+nav.index{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 12px);max-height:calc(100vh - 24px);overflow:auto;display:grid;gap:14px;padding-bottom:12px}
+.controls{display:grid;gap:10px}
+.seg{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 13px var(--f-body);padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+input#q{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:14px var(--f-body)}
+.idx-group h3{font:700 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 6px}
+.idx-group ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.idx-group a{display:grid;grid-template-columns:44px 1fr;gap:6px;align-items:baseline;text-decoration:none;color:var(--ink);padding:4px 6px;border-radius:6px;font-size:13px;line-height:1.35}
+.idx-group a:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.idx-group a .id{font:600 12px var(--f-mono);color:var(--muted)}
+.idx-group a .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px}
+
+main{display:grid;gap:28px;min-width:0}
+section.block{min-width:0}
+h2.tier{font:800 26px/1.1 var(--f-display);font-stretch:88%;margin:12px 0 4px}
+.tier-note{color:var(--muted);margin:0 0 4px;max-width:70ch}
+
+article.sol{--c:var(--excl);background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:10px;padding:20px 22px;display:grid;gap:14px;min-width:0;scroll-margin-top:16px}
+.sol-head{display:grid;gap:8px}
+.sol-id{font:700 13px/1 var(--f-mono);color:var(--c)}
+.sol h3{font:750 22px/1.15 var(--f-display);font-stretch:92%;margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:600 11.5px/1.4 var(--f-mono);border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--muted)}
+.tag.win7{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
+.summary{margin:0;max-width:72ch}
+.flow{margin:0;padding:10px 12px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 7%,transparent);border-radius:0 6px 6px 0;font-size:14px}
+.flow b{color:var(--c)}
+dl.req{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px 16px;margin:0}
+dl.req div{min-width:0}
+dl.req dt{font:600 11px/1.2 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+dl.req dd{margin:2px 0 0;font-size:14px;font-variant-numeric:tabular-nums}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:14px}
+ol.steps > li{counter-increment:s;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
+ol.steps > li::before{content:counter(s);font:700 13px/26px var(--f-mono);text-align:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--c);color:var(--c)}
+.step-body{min-width:0;display:grid;gap:6px}
+.step-body h4{margin:2px 0 0;font:700 15px/1.3 var(--f-body)}
+.step-body p{margin:0;max-width:72ch}
+.code{position:relative;min-width:0}
+.code pre{margin:0;background:var(--code);color:var(--code-ink);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono);white-space:pre}
+.code .lbl{position:absolute;top:-9px;left:10px;font:600 10.5px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;background:var(--surface);color:var(--muted);padding:2px 6px;border:1px solid var(--line);border-radius:4px}
+.code button.copy{position:absolute;top:6px;right:6px;font:600 11.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:3px 8px;cursor:pointer}
+.callout{border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:10px 12px;font-size:14px}
+.callout b{color:var(--warn)}
+.callout.info{border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.callout.info b{color:var(--accent)}
+.foot{border-top:1px solid var(--line);margin-top:24px;padding-top:18px;color:var(--muted);font-size:13.5px;display:grid;gap:8px}
+.foot ul{margin:0;padding-left:18px}
+.empty{color:var(--muted);font-style:italic}
+@media (max-width: 860px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  nav.index{position:static;max-height:none}
+  .idx-groups{display:none}
+}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Manual installation · 21 configurations · Windows &amp; Linux</div>
+    <h1>Claude Code Setup Atlas</h1>
+    <p class="lede">
+	Companion Resource for the parent paper: <b>Privacy Risk Profiling in Claude Code-Based LLM Access Architectures - A Systematic Analysis</b>
+	<br>If and When using these resources, 
+you default agree you use them under GPL 3.0 licence, 
+and cite the corresponding parent paper as:
+	<br><br>J.L. de Miranda, M. Nagy, N. Popescu-Bodorin, 
+Privacy Risk Profiling in Claude Code-Based LLM Access Architectures - A Systematic Analysis, 
+Int. J. Comput. Commun. Control 
+(Online ISSN 1841-9844, ISSN-L 1841-9836), 
+<!--volume(issue), artnum, --> 2026.
+
+	<br><br><b>Alternative Step-by-step manual installation</b> for every LLM access configuration in the ontology (014.ontology.txt, v1.1) and the paper <i>Privacy Risk Profiling in Claude Code–Based LLM Access Architectures</i>. Each configuration carries the paper's exposure class, so you can see where your source code goes before you install anything. 
+	<br><br><b>Use this file to guide yourself along the manual installation process for one or all configurations of interest from below, especially if using the ontology file for automatic instalations proves to be difficult</b></p>
+    <div class="legend" aria-label="Exposure classes">
+      <span class="chip c-local">Pure Local: code never leaves the machine</span>
+      <span class="chip c-hybrid">Hybrid Routing: local and cloud, by rule</span>
+      <span class="chip c-cloud">Free Cloud: code sent to a provider</span>
+      <span class="chip c-paid">Paid / Temporary Credits</span>
+      <span class="chip c-excl">Excluded from the class analysis</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="index" aria-label="Configurations">
+      <div class="controls">
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">Show commands for</div>
+          <div class="seg" role="group" aria-label="Operating system">
+            <button type="button" id="os-win" data-os="win" aria-pressed="true">Windows</button>
+            <button type="button" id="os-linux" data-os="linux" aria-pressed="false">Linux</button>
+          </div>
+        </div>
+        <label for="q" class="eyebrow">Find a configuration</label>
+        <input id="q" type="search" placeholder="e.g. Groq, Win 7, LM Studio">
+        <div class="legend" id="filters" aria-label="Filter by exposure class"></div>
+      </div>
+      <div class="idx-groups" id="index"></div>
+    </nav>
+
+    <main id="main"></main>
+  </div>
+
+  <footer class="foot">
+    <div><b>How to read this guide.</b> Steps marked “Do Prerequisite P1” refer to the shared steps at the top. Commands for community tools (the free-claude-code and claude-code-proxy packages) come from the ontology; check each project's README before relying on them, because their package names and flags change often.</div>
+    <div><b>Version notes.</b> The ontology records each configuration's installation scripts as compiled in June 2026. The tools have changed since, so the commands on this page follow their current documentation (checked 29 October 2026), and each card notes the ontology's recorded form wherever the two differ. The affected settings are the Ollama address and dummy credential, the claude-code-router file layout and routing rules, the Amazon Bedrock and Google Vertex AI switches, the llama.cpp build flags, and the Claude Max sign-in. The architecture, endpoints and exposure class of every configuration are unchanged.</div>
+    <div>References:
+      <ul>
+        <li><a href="https://docs.ollama.com/api/anthropic-compatibility" target="_blank" rel="noopener">Ollama: Anthropic compatibility</a></li>
+        <li><a href="https://musistudio.github.io/claude-code-router/docs/cli/config/basic" target="_blank" rel="noopener">claude-code-router: basic configuration</a></li>
+        <li><a href="https://code.claude.com/docs/en/amazon-bedrock" target="_blank" rel="noopener">Claude Code on Amazon Bedrock</a> · <a href="https://code.claude.com/docs/en/google-vertex-ai" target="_blank" rel="noopener">Claude Code on Google Vertex AI</a></li>
+      </ul>
+    </div>
+  </footer>
+</div>
+
+<script>
+const R = String.raw;
+const CLASS = {
+  local:{label:"Pure Local", cls:"c-local"},
+  hybrid:{label:"Hybrid Routing", cls:"c-hybrid"},
+  cloud:{label:"Free Cloud", cls:"c-cloud"},
+  paid:{label:"Paid / Temp Credits", cls:"c-paid"},
+  excl:{label:"Excluded", cls:"c-excl"}
+};
+
+/* ---------- Shared prerequisites ---------- */
+const PREREQ = [
+ {id:"P1", title:"Node.js 20 LTS", text:"Required by the official Claude Code CLI and by claude-code-router. Node.js 18+ needs Windows 8.1 or later; on Windows 7 use the Python-based options (S1.5, S2.8, S2.9).",
+  code:{win:R`winget install OpenJS.NodeJS.LTS
+REM Close this terminal and open a new one, then:
+node --version
+npm --version`,
+  linux:R`curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+# Fedora: sudo dnf install -y nodejs npm
+# Arch:   sudo pacman -S --noconfirm nodejs npm
+node --version`}},
+ {id:"P2", title:"Claude Code CLI", text:"Installs the claude command.",
+  code:{all:R`npm install -g @anthropic-ai/claude-code
+claude --version`}},
+ {id:"P3", title:"Ollama 0.14 or later", text:"Ollama 0.14+ speaks the Anthropic Messages API natively, so Claude Code can talk to it without a proxy. It runs as a background service after installation.",
+  code:{win:R`winget install Ollama.Ollama
+REM or download OllamaSetup.exe from https://ollama.com/download
+REM Open a new terminal, then:
+ollama --version`,
+  linux:R`curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl enable --now ollama
+# Without systemd (WSL 1, Docker): run  ollama serve &  in a separate terminal
+ollama --version`}},
+ {id:"P4", title:"Python 3.8 or later", text:"Needed for the Python proxies. Python 3.8 is the last release that supports Windows 7 SP1; on Windows 10+ use 3.11 or newer. Tick “Add Python to PATH” in the installer.",
+  code:{win:R`REM Install from https://python.org/downloads (3.8.x on Windows 7)
+python --version`,
+  linux:R`sudo apt-get install -y python3 python3-pip
+# Fedora: sudo dnf install -y python3 python3-pip
+python3 --version`}},
+ {id:"P5", title:"claude-code-router (ccr)", text:"A local proxy that sends Claude Code's requests to other providers. Start sessions with ccr code. Current router versions read ~/.claude-code-router/config.json (on Windows, %USERPROFILE%\\.claude-code-router\\config.json) with a Providers list, the layout used on this page. The ontology's scripts record an earlier layout (a providers object, saved under %APPDATA% on Windows); if your router version expects that layout, use the ontology's files.",
+  code:{all:R`npm install -g @musistudio/claude-code-router`}},
+ {id:"P6", title:"Point Claude Code at local Ollama", text:"Redirects Claude Code to Ollama through ANTHROPIC_BASE_URL and gives it a dummy credential that Ollama ignores. The ontology and the paper record this credential as ANTHROPIC_API_KEY=ollama and the address as http://localhost:11434/v1. Current Ollama documentation uses ANTHROPIC_AUTH_TOKEN and the address without /v1, because Claude Code adds /v1/messages itself; the commands below follow that documentation.",
+  code:{win:R`setx ANTHROPIC_BASE_URL "http://localhost:11434"
+setx ANTHROPIC_AUTH_TOKEN "ollama"
+REM Open a new terminal for the variables to take effect`,
+  linux:R`echo 'export ANTHROPIC_BASE_URL="http://localhost:11434"' >> ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="ollama"' >> ~/.bashrc
+source ~/.bashrc`}}
+];
+
+/* helper for ccr config steps */
+const ccrWrite = {win:R`mkdir "%USERPROFILE%\.claude-code-router"
+notepad "%USERPROFILE%\.claude-code-router\config.json"
+REM Paste the JSON below, replace the key, save`,
+ linux:R`mkdir -p ~/.claude-code-router
+nano ~/.claude-code-router/config.json
+# Paste the JSON below, replace the key, save (Ctrl+O, Enter, Ctrl+X)`};
+const ccrJSON = (name, base, key, model) => R`{
+  "Providers": [
+    {
+      "name": "${name}",
+      "baseUrl": "${base}",
+      "apiKey": "${key}",
+      "models": ["${model}"]
+    }
+  ],
+  "Router": {
+    "default": "${name},${model}"
+  }
+}`;
+const unsetVars = {win:R`reg delete HKCU\Environment /v ANTHROPIC_BASE_URL /f
+reg delete HKCU\Environment /v ANTHROPIC_AUTH_TOKEN /f
+REM Open a new terminal afterwards`,
+ linux:R`sed -i '/ANTHROPIC_BASE_URL/d;/ANTHROPIC_AUTH_TOKEN/d' ~/.bashrc
+unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN`};
+
+/* ---------- The 21 configurations ---------- */
+const SOL = [
+/* TIER 0 */
+{id:"T0", tier:0, cls:"hybrid", title:"Ollama local + Claude Code Router + OpenRouter cloud",
+ summary:"The ontology's recommended daily setup. Sensitive work runs on a local Qwen3-Coder model through Ollama; larger or less sensitive tasks go to OpenRouter's free tier through claude-code-router.",
+ flow:"<b>Where code goes:</b> local only when you run Claude Code directly against Ollama, or when every router rule points to Ollama. Any rule set to OpenRouter sends source code to openrouter.ai.",
+ req:[["OS","Windows 10+ · Linux kernel 4.0+"],["RAM","8 GB min, 16 GB recommended"],["Disk","15 GB"],["Internet","Only for OpenRouter requests"],["Cost","$0"]],
+ steps:[
+  {h:"Install Node.js, Claude Code, Ollama and the router", p:"Do Prerequisites P1, P2, P3 and P5."},
+  {h:"Download the local model", p:"About 5–7 GB. On machines with under 8 GB RAM, pull qwen3-coder:4b instead.", code:{all:R`ollama pull qwen3-coder`}},
+  {h:"Point Claude Code at Ollama", p:"Do Prerequisite P6. With these variables, plain claude uses the local model and never touches the router."},
+  {h:"Get an OpenRouter key", p:"Sign up at openrouter.ai, open API Keys and create a key (starts with sk-or-). A one-time $5 deposit raises the free-model limit from 50 to 1,000 requests a day; free models do not consume it."},
+  {h:"Write the router configuration (as recorded in the ontology)", p:"OpenRouter is the default, projects classified under the private rule go to Ollama, and background tasks go to OpenRouter. This is the mixed-use setup the paper scores at 3.2: requests not matched by the private rule leave the machine.", code:{...ccrWrite}},
+  {h:"", lbl:"config.json · mixed use", code:{all:R`{
+  "Providers": [
+    { "name": "ollama", "baseUrl": "http://localhost:11434/v1",
+      "apiKey": "ollama", "models": ["qwen3-coder"] },
+    { "name": "openrouter", "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "sk-or-YOUR_KEY",
+      "models": ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat:free"] }
+  ],
+  "Router": {
+    "default": "openrouter,meta-llama/llama-3.3-70b-instruct:free",
+    "private": "ollama,qwen3-coder",
+    "background": "openrouter,deepseek/deepseek-chat:free"
+  }
+}`}},
+  {h:"For sensitive code: make every rule local", p:"The paper scores T0 at 0.8, the same as a pure local setup, only when all traffic stays on Ollama. Either run Claude Code directly against Ollama (step 7, first line), or point every routing rule, including background, to the local model as below and switch to the cloud deliberately with /model.", code:{all:R`  "Router": {
+    "default": "ollama,qwen3-coder",
+    "background": "ollama,qwen3-coder"
+  }`}, lbl:"config.json · all local"},
+  {h:"Use it", p:"Run claude for local-only work. Run ccr code for routed sessions, and switch models inside a session with /model provider,model.", code:{all:R`claude --model qwen3-coder            # local only, router bypassed
+ccr code                              # routed session
+/model openrouter,meta-llama/llama-3.3-70b-instruct:free   # inside a session: go to cloud
+/model ollama,qwen3-coder                                   # back to local`}}
+ ],
+ notes:[["info","Router rules","Current claude-code-router documentation lists the default, background, think and longContext rules. If your router version does not act on the private rule, use the all-local Router block from step 6 for sensitive projects."]]},
+
+/* TIER 1 */
+{id:"S1.1", tier:1, cls:"local", title:"Ollama + Qwen3-Coder + Claude Code",
+ summary:"The recommended pure local setup. Zero cost, no rate limits, and no source code leaves the machine once the model is downloaded.",
+ flow:"<b>Where code goes:</b> only to localhost:11434. Network capture in the paper found no external connections.",
+ req:[["OS","Windows 10+ · Linux kernel 4.0+"],["RAM","8 GB (16 GB for larger variants)"],["Disk","10 GB"],["GPU","Optional"],["Cost","$0"]],
+ steps:[
+  {h:"Install Node.js, Claude Code and Ollama", p:"Do Prerequisites P1, P2 and P3."},
+  {h:"Download the model", code:{all:R`ollama pull qwen3-coder
+# under 8 GB RAM:  ollama pull qwen3-coder:4b`}},
+  {h:"Point Claude Code at Ollama", p:"Do Prerequisite P6."},
+  {h:"Start a session", code:{all:R`ollama list                   # qwen3-coder should be listed
+claude --model qwen3-coder`}},
+  {h:"Optional: longer context", code:{win:R`set OLLAMA_NUM_CTX=65536 && claude --model qwen3-coder`, linux:R`OLLAMA_NUM_CTX=65536 claude --model qwen3-coder`}}
+ ],
+ notes:[["info","Other local models","Pull any of these and pass the same name to --model: llama3.3:70b, codellama:34b, deepseek-coder-v3 (as listed in the ontology; confirm the tag on ollama.com)."]]},
+
+{id:"S1.2", tier:1, cls:"local", title:"Ollama + Gemma 4 27B + Claude Code",
+ summary:"A larger local model with a 128K-token context window. Same architecture as S1.1, heavier hardware.",
+ flow:"<b>Where code goes:</b> only to localhost:11434.",
+ req:[["OS","Windows 10+ · Linux kernel 4.0+"],["RAM","16 GB min"],["Disk","18 GB"],["GPU","8 GB VRAM recommended"],["Cost","$0"]],
+ steps:[
+  {h:"Install Node.js, Claude Code and Ollama", p:"Do Prerequisites P1, P2 and P3."},
+  {h:"Download the model", p:"About 16 GB; allow 20–60 minutes.", code:{all:R`ollama pull gemma4:27b`}},
+  {h:"Point Claude Code at Ollama", p:"Do Prerequisite P6."},
+  {h:"Start a session", code:{win:R`claude --model gemma4:27b
+REM long context:
+set OLLAMA_NUM_CTX=65536 && claude --model gemma4:27b`, linux:R`claude --model gemma4:27b
+# long context:
+OLLAMA_NUM_CTX=65536 claude --model gemma4:27b`}}
+ ],
+ notes:[["info","GPU acceleration","Ollama uses an NVIDIA GPU automatically when the driver is installed (Windows driver 452.39+; on Linux check nvidia-smi). AMD ROCm works on Linux only."]]},
+
+{id:"S1.3", tier:1, cls:"local", title:"LM Studio + DeepSeek Coder + Claude Code",
+ summary:"A graphical app for downloading and serving GGUF models, for people who prefer a GUI to the command line.",
+ flow:"<b>Where code goes:</b> only to localhost:1234.",
+ req:[["OS","Windows 10+ · Linux glibc 2.28+"],["RAM","8 GB min (7B model), 16 GB recommended"],["Disk","10 GB+, depending on the model"],["Cost","$0"]],
+ steps:[
+  {h:"Install LM Studio", p:"Download the installer (Windows) or AppImage (Linux) from lmstudio.ai. Always take the latest version from the website.", code:{win:R`REM Run the downloaded LM-Studio installer, then launch LM Studio`, linux:R`chmod +x LM-Studio-*.AppImage
+sudo apt-get install -y libfuse2     # Ubuntu, if the AppImage will not start
+./LM-Studio-*.AppImage`}},
+  {h:"Download a coding model", p:"In LM Studio, search for the DeepSeek Coder model listed in the ontology (deepseek-coder-v3) or another coding model, and choose the Q4_K_M quantization."},
+  {h:"Start the local server", p:"Open the server tab, load the model and start the server on port 1234. Leave LM Studio running."},
+  {h:"Install Node.js and Claude Code", p:"Do Prerequisites P1 and P2."},
+  {h:"Point Claude Code at LM Studio", p:"Same pattern as Prerequisite P6. The ontology records http://localhost:1234/v1 with ANTHROPIC_API_KEY=lmstudio; the form below omits /v1, which Claude Code adds itself.", code:{win:R`setx ANTHROPIC_BASE_URL "http://localhost:1234"
+setx ANTHROPIC_AUTH_TOKEN "lmstudio"
+REM Open a new terminal`, linux:R`echo 'export ANTHROPIC_BASE_URL="http://localhost:1234"' >> ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="lmstudio"' >> ~/.bashrc
+source ~/.bashrc`}},
+  {h:"Start a session", code:{all:R`claude`}}
+ ],
+ notes:[["warn","Check API compatibility","Claude Code speaks the Anthropic Messages API. Make sure your LM Studio version serves an Anthropic-compatible endpoint; if it only offers the OpenAI-compatible one, put LiteLLM (S2.8) between them with LM Studio as its only provider."]]},
+
+{id:"S1.4", tier:1, cls:"cloud", title:"Ollama + GLM-4.7 cloud model",
+ summary:"Uses Ollama's :cloud models, which run on Ollama's servers. Almost no local RAM or disk needed. The ontology lists it in Tier 1, but the paper classifies it as Free Cloud.",
+ flow:"<b>Where code goes:</b> to Ollama's cloud servers. Do not use for proprietary or sensitive code.",
+ req:[["OS","Windows 10+ · Linux kernel 4.0+"],["RAM","4 GB"],["Disk","2 GB"],["Internet","Required for every request"],["Cost","$0"]],
+ steps:[
+  {h:"Install Node.js, Claude Code and Ollama", p:"Do Prerequisites P1, P2 and P3."},
+  {h:"Sign in to Ollama and fetch the model reference", p:"Cloud models run through a signed-in Ollama server. The ontology's script pulls the cloud model reference first; current Ollama versions also accept the cloud name without a pull.", code:{all:R`ollama signin
+ollama pull glm4.7:cloud`}},
+  {h:"Point Claude Code at Ollama", p:"Do Prerequisite P6."},
+  {h:"Start a session", p:"The ontology uses glm4.7:cloud. Check the exact name at ollama.com/search?c=cloud, since cloud tags change.", code:{all:R`claude --model glm4.7:cloud`}}
+ ]},
+
+{id:"S1.5", tier:1, cls:"local", win7:true, title:"llama.cpp + Qwen2.5-Coder + Free Claude Code proxy",
+ summary:"The most compatible local setup: runs on Windows Vista SP2 / 7 SP1 and Linux kernel 3.0+. A Python proxy translates Claude Code requests for llama.cpp's server.",
+ flow:"<b>Where code goes:</b> only to localhost:8080.",
+ req:[["OS","Windows 7 SP1+ · Linux kernel 3.0+"],["RAM","8 GB (7B) · 24 GB (32B)"],["Disk","5 GB (7B) · 20 GB (32B)"],["Cost","$0"]],
+ steps:[
+  {h:"Install Python", p:"Do Prerequisite P4."},
+  {h:"Install the Free Claude Code proxy", code:{win:R`pip install free-claude-code
+free-claude-code --help`, linux:R`pip install free-claude-code || pip install free-claude-code --break-system-packages
+free-claude-code --help`}},
+  {h:"Install llama.cpp", p:"Windows: download a release zip from github.com/ggml-org/llama.cpp/releases (the AVX build for most CPUs, the CUDA build for NVIDIA GPUs) and extract it to C:\\llama.cpp. Linux: build from source. The ontology's build script uses the flag names LLAMA_NATIVE and LLAMA_CUDA; current llama.cpp releases call them GGML_NATIVE and GGML_CUDA.", code:{win:R`C:\llama.cpp\llama-server.exe --help`, linux:R`sudo apt-get install -y cmake build-essential git
+git clone --depth=1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp
+cd /tmp/llama.cpp && mkdir build && cd build
+cmake .. -DGGML_NATIVE=ON -DCMAKE_BUILD_TYPE=Release   # NVIDIA: -DGGML_CUDA=ON
+make -j$(nproc)
+sudo cp bin/llama-server /usr/local/bin/`}},
+  {h:"Download a GGUF model", p:"8 GB RAM: Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf (about 4.4 GB). 24 GB RAM: Qwen2.5-Coder-32B-Instruct-Q4_K_M.gguf (about 18 GB). Both are on huggingface.co/Qwen."},
+  {h:"Start the llama.cpp server", p:"Keep this terminal open. Use -ngl 99 to offload all layers to a GPU.", code:{win:R`C:\llama.cpp\llama-server.exe -m "C:\Models\model.gguf" --port 8080 -ngl 0`, linux:R`llama-server -m ~/models/model.gguf --port 8080 -ngl 0`}},
+  {h:"Configure and run the proxy", p:"In a second terminal.", code:{all:R`free-claude-code config --provider llama.cpp --port 8080
+free-claude-code`}}
+ ],
+ notes:[["warn","Community tool","The package name and commands for the Free Claude Code proxy come from the ontology. Check the project's README before installing."],
+        ["warn","NIS2","Windows 7 has had no security updates since January 2023. The paper rates any Windows 7 deployment non-compliant for NIS2 essential entities."]]},
+
+/* TIER 2 */
+{id:"S2.1", tier:2, cls:"cloud", title:"Claude Code Router + OpenRouter",
+ summary:"OpenRouter aggregates 200+ models, 30+ of them free. Nothing is downloaded locally.",
+ flow:"<b>Where code goes:</b> openrouter.ai, full source in each request. Free tier routes to US servers by default.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","50 req/day, 1,000 with a $5 deposit"],["Cost","$0"]],
+ steps:[
+  {h:"Get an OpenRouter key", p:"openrouter.ai → API Keys → Create Key (sk-or-…)."},
+  {h:"Install Node.js, Claude Code and the router", p:"Do Prerequisites P1, P2 and P5."},
+  {h:"Write the router configuration", code:{...ccrWrite}},
+  {h:"", lbl:"config.json", code:{all:ccrJSON("openrouter","https://openrouter.ai/api/v1","sk-or-YOUR_KEY","meta-llama/llama-3.3-70b-instruct:free")}},
+  {h:"Start a session", p:"Other free models: google/gemini-2.0-flash-exp:free, deepseek/deepseek-chat:free, mistralai/mistral-7b-instruct:free (add them to models and change default).", code:{all:R`ccr code`}}
+ ],
+ notes:[["info","Keep the key out of ANTHROPIC_API_KEY","ccr code sets Claude Code's endpoint itself. If you also put the OpenRouter key in ANTHROPIC_API_KEY, running plain claude would send it to Anthropic."]]},
+
+{id:"S2.2", tier:2, cls:"cloud", title:"Claude Code Router + Gemini (Google AI Studio)",
+ summary:"Free access to Gemini 2.0 Flash through Google AI Studio.",
+ flow:"<b>Where code goes:</b> generativelanguage.googleapis.com.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","~150 req/day (cut 50–80% in Dec 2025)"],["Cost","$0"]],
+ steps:[
+  {h:"Get an AI Studio key", p:"aistudio.google.com/apikey → Create API key (AIza…)."},
+  {h:"Install Node.js, Claude Code and the router", p:"Do Prerequisites P1, P2 and P5."},
+  {h:"Write the router configuration", code:{...ccrWrite}},
+  {h:"", lbl:"config.json", code:{all:ccrJSON("gemini","https://generativelanguage.googleapis.com/v1beta/openai","AIza-YOUR_KEY","gemini-2.0-flash-exp")}},
+  {h:"Start a session", code:{all:R`ccr code`}}
+ ]},
+
+{id:"S2.3", tier:2, cls:"cloud", title:"Claude Code Router + Groq",
+ summary:"GroqCloud's LPU hardware gives very fast inference with a generous free tier for Llama 3.3 70B.",
+ flow:"<b>Where code goes:</b> api.groq.com (US infrastructure).",
+ req:[["OS","Windows 10+ · Linux"],["Limit","30 req/min · 14,400 req/day"],["Cost","$0"]],
+ steps:[
+  {h:"Get a Groq key", p:"console.groq.com/keys → Create API Key (gsk_…)."},
+  {h:"Install Node.js, Claude Code and the router", p:"Do Prerequisites P1, P2 and P5."},
+  {h:"Write the router configuration", code:{...ccrWrite}},
+  {h:"", lbl:"config.json", code:{all:ccrJSON("groq","https://api.groq.com/openai/v1","gsk_YOUR_KEY","llama-3.3-70b-versatile")}},
+  {h:"Start a session", code:{all:R`ccr code`}}
+ ]},
+
+{id:"S2.4", tier:2, cls:"cloud", title:"Claude Code Router + NVIDIA NIM",
+ summary:"NVIDIA gives 1,000 free API credits on registration for large models such as Llama 3.1 405B.",
+ flow:"<b>Where code goes:</b> integrate.api.nvidia.com.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","1,000 initial credits"],["Cost","$0 until credits run out"]],
+ steps:[
+  {h:"Get an NVIDIA key", p:"build.nvidia.com → Get API Key (nvapi-…)."},
+  {h:"Install Node.js, Claude Code and the router", p:"Do Prerequisites P1, P2 and P5."},
+  {h:"Write the router configuration", code:{...ccrWrite}},
+  {h:"", lbl:"config.json", code:{all:ccrJSON("nvidia","https://integrate.api.nvidia.com/v1","nvapi-YOUR_KEY","meta/llama-3.1-405b-instruct")}},
+  {h:"Start a session", code:{all:R`ccr code`}}
+ ]},
+
+{id:"S2.5", tier:2, cls:"cloud", title:"OpenCode + OpenRouter",
+ summary:"OpenCode is an open-source alternative to Claude Code with built-in support for 75+ providers, so no router is needed.",
+ flow:"<b>Where code goes:</b> openrouter.ai.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","50–1,000 req/day"],["Cost","$0"]],
+ steps:[
+  {h:"Get an OpenRouter key", p:"See S2.1, step 1."},
+  {h:"Install Node.js and OpenCode", p:"Do Prerequisite P1, then:", code:{all:R`npm install -g opencode-ai
+opencode --version`}},
+  {h:"Connect OpenRouter and pick a free model", code:{all:R`opencode
+/connect openrouter        # paste your sk-or- key when asked
+/models                    # choose a :free model`}}
+ ]},
+
+{id:"S2.6", tier:2, cls:"cloud", title:"OpenCode + Cerebras",
+ summary:"Cerebras wafer-scale hardware, roughly 2,000 tokens per second, with a free tier for Llama 3.3 70B.",
+ flow:"<b>Where code goes:</b> Cerebras cloud.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","60 req/min · 30,000 tokens/min"],["Cost","$0"]],
+ steps:[
+  {h:"Get a Cerebras key", p:"cloud.cerebras.ai → API Keys."},
+  {h:"Install Node.js and OpenCode", p:"Do Prerequisite P1, then:", code:{all:R`npm install -g opencode-ai`}},
+  {h:"Connect Cerebras", code:{all:R`opencode
+/connect cerebras
+/models                    # choose llama-3.3-70b`}}
+ ]},
+
+{id:"S2.7", tier:2, cls:"cloud", title:"OpenCode + Hugging Face Inference",
+ summary:"Free access to many open models, including Qwen2.5-Coder-32B. Tool-use support varies by model.",
+ flow:"<b>Where code goes:</b> Hugging Face inference servers.",
+ req:[["OS","Windows 10+ · Linux"],["Limit","Varies by model"],["Cost","$0"]],
+ steps:[
+  {h:"Get a token", p:"huggingface.co/settings/tokens → New token, Read access (hf_…)."},
+  {h:"Install Node.js and OpenCode", p:"Do Prerequisite P1, then:", code:{all:R`npm install -g opencode-ai`}},
+  {h:"Connect Hugging Face", code:{all:R`opencode
+/connect huggingface
+/models                    # e.g. Qwen/Qwen2.5-Coder-32B-Instruct`}}
+ ],
+ notes:[["info","Tool use","If file edits or commands fail, switch to a model with function-calling support, such as Qwen2.5-Coder-32B-Instruct or Llama-3.3-70B-Instruct."]]},
+
+{id:"S2.8", tier:2, cls:"cloud", win7:true, title:"LiteLLM local proxy + multi-provider routing",
+ summary:"A Python proxy on your machine that gives Claude Code one local endpoint and spreads requests across free providers with automatic fallback. The proxy itself runs on Windows 7.",
+ flow:"<b>Where code goes:</b> OpenRouter, then Gemini, then Groq if earlier providers fail. A single prompt may reach all three.",
+ req:[["OS","Windows 7 SP1+ (proxy) · Linux"],["Keys","At least one of OpenRouter, Gemini, Groq"],["Cost","$0"]],
+ steps:[
+  {h:"Install Python", p:"Do Prerequisite P4."},
+  {h:"Install LiteLLM", code:{win:R`pip install "litellm[proxy]"`, linux:R`pip install "litellm[proxy]" || pip install "litellm[proxy]" --break-system-packages`}},
+  {h:"Write the LiteLLM configuration", code:{win:R`mkdir "%USERPROFILE%\.litellm"
+notepad "%USERPROFILE%\.litellm\config.yaml"`, linux:R`mkdir -p ~/.litellm
+nano ~/.litellm/config.yaml`}},
+  {h:"", lbl:"config.yaml", code:{all:R`model_list:
+  - model_name: llama-free
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+      api_key: sk-or-YOUR_OPENROUTER_KEY
+  - model_name: gemini-free
+    litellm_params:
+      model: gemini/gemini-2.0-flash-exp
+      api_key: AIza-YOUR_GEMINI_KEY
+  - model_name: groq-llama
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: gsk_YOUR_GROQ_KEY
+router_settings:
+  num_retries: 3
+  fallbacks:
+    - llama-free: [gemini-free, groq-llama]`}},
+  {h:"Start the proxy", p:"Keep this terminal open. The ontology starts it with python -m litellm --port 4000 --config …; the litellm command below is the entry point installed with litellm[proxy].", code:{win:R`litellm --config "%USERPROFILE%\.litellm\config.yaml" --port 4000`, linux:R`litellm --config ~/.litellm/config.yaml --port 4000`}},
+  {h:"Point Claude Code at the proxy", p:"Windows 10+ and Linux only: do Prerequisites P1 and P2, then set the variables. As in P6, the ontology records the dummy credential as ANTHROPIC_API_KEY; ANTHROPIC_MODEL makes Claude Code ask for your LiteLLM alias.", code:{win:R`setx ANTHROPIC_BASE_URL "http://localhost:4000"
+setx ANTHROPIC_AUTH_TOKEN "sk-local"
+setx ANTHROPIC_MODEL "llama-free"
+REM Open a new terminal, then run: claude`, linux:R`echo 'export ANTHROPIC_BASE_URL="http://localhost:4000"' >> ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="sk-local"' >> ~/.bashrc
+echo 'export ANTHROPIC_MODEL="llama-free"' >> ~/.bashrc
+source ~/.bashrc
+claude`}}
+ ],
+ notes:[["warn","Windows 7","The Claude Code CLI needs Node.js 18+, which needs Windows 8.1 or later. On Windows 7 the proxy runs, but you need a compatible frontend such as the Free Claude Code proxy client from S1.5."]]},
+
+{id:"S2.9", tier:2, cls:"cloud", win7:true, title:"claude-code-proxy (Python) + OpenRouter",
+ summary:"A simpler single-provider Python proxy that translates Anthropic API calls to OpenAI or Gemini format.",
+ flow:"<b>Where code goes:</b> openrouter.ai (or Gemini, if configured).",
+ req:[["OS","Windows 7 SP1+ (proxy) · Linux"],["Limit","As for the chosen provider"],["Cost","$0"]],
+ steps:[
+  {h:"Get an OpenRouter key", p:"See S2.1, step 1."},
+  {h:"Install Python and the proxy", p:"Do Prerequisite P4, then:", code:{win:R`pip install claude-code-proxy`, linux:R`pip install claude-code-proxy || pip install claude-code-proxy --break-system-packages`}},
+  {h:"Install Claude Code", p:"Windows 10+ and Linux: do Prerequisites P1 and P2. On Windows 7, use the Free Claude Code client from S1.5 instead."},
+  {h:"Start the proxy", p:"Keep this terminal open.", code:{all:R`ccp --provider openrouter --api-key sk-or-YOUR_KEY --port 8082`}},
+  {h:"Point Claude Code at the proxy", code:{win:R`setx ANTHROPIC_BASE_URL "http://localhost:8082"
+setx ANTHROPIC_AUTH_TOKEN "sk-local"
+REM Open a new terminal, then run: claude`, linux:R`export ANTHROPIC_BASE_URL="http://localhost:8082"
+export ANTHROPIC_AUTH_TOKEN="sk-local"
+claude`}}
+ ],
+ notes:[["warn","Community tool","The package name and the ccp command come from the ontology. Check the project's README before installing."]]},
+
+{id:"S2.10", tier:2, cls:"hybrid", title:"Hybrid routing: Ollama local + OpenRouter cloud",
+ summary:"The same architecture as T0, set up independently. The ontology lists it in Tier 2 because its cloud component has daily limits.",
+ flow:"<b>Where code goes:</b> as for T0. Local only while every active rule points to Ollama.",
+ req:[["OS","Windows 10+ · Linux kernel 4.0+"],["RAM","8 GB min"],["Disk","15 GB"],["Cost","$0"]],
+ steps:[
+  {h:"Follow T0", p:"Do every step of T0. For sensitive projects, use the all-local Router block from T0, step 6."},
+  {h:"Use it", code:{all:R`claude --model qwen3-coder     # local only
+ccr code                       # routed session
+/model openrouter,deepseek/deepseek-chat:free   # inside a session: another cloud model`}}
+ ]},
+
+/* TIER 3 */
+{id:"S3.1", tier:3, cls:"paid", title:"Anthropic Open Source Program (Claude Max)",
+ summary:"Maintainers of active open-source projects can apply for a free Claude Max subscription for 6 months (about $1,200 in value).",
+ flow:"<b>Where code goes:</b> Anthropic's servers (api.anthropic.com).",
+ req:[["OS","Windows 10+ · Linux"],["Eligibility","Active open-source project with contributors"],["Duration","6 months"]],
+ steps:[
+  {h:"Apply", p:"Apply at anthropic.com/programs/open-source with your project URL and contributor details. Approval arrives by email."},
+  {h:"Install Node.js and Claude Code", p:"Do Prerequisites P1 and P2."},
+  {h:"Remove any local-endpoint variables", p:"If you set up an Ollama or proxy configuration earlier, remove its variables so Claude Code talks to Anthropic.", code:{...unsetVars}},
+  {h:"Sign in with your Claude account", p:"Run claude and choose the Claude subscription login; this is how the Max subscription is used. The ontology's script instead sets an sk-ant- API key, which bills the Console account separately from the subscription.", code:{all:R`claude
+/model                # pick Opus or Sonnet`}}
+ ]},
+
+{id:"S3.2", tier:3, cls:"paid", title:"Google Cloud Vertex AI ($300 free trial)",
+ summary:"New Google Cloud accounts get $300 in credits for 90 days. Claude runs on Vertex AI (now called Agent Platform), which Claude Code supports natively.",
+ flow:"<b>Where code goes:</b> Google Cloud. EU data residency is available with an EU region.",
+ req:[["OS","Windows 10+ · Linux"],["Credit","$300 for 90 days"],["Needs","Billing account, gcloud CLI"]],
+ steps:[
+  {h:"Start the free trial and create a project", p:"Activate the trial at cloud.google.com/free, create a project and note its Project ID."},
+  {h:"Enable the API and request Claude access", p:"Enable the API, then request access to the Claude models you want in Model Garden (approval can take 24–48 hours).", code:{all:R`gcloud config set project YOUR-PROJECT-ID
+gcloud services enable aiplatform.googleapis.com`}},
+  {h:"Install gcloud and sign in", p:"Windows: run the installer from cloud.google.com/sdk/docs/install. Linux:", code:{win:R`gcloud auth application-default login`, linux:R`curl -fsSL https://sdk.cloud.google.com | bash
+export PATH="$HOME/google-cloud-sdk/bin:$PATH"     # also add this line to ~/.bashrc
+gcloud auth application-default login`}},
+  {h:"Install Node.js and Claude Code", p:"Do Prerequisites P1 and P2."},
+  {h:"Enable Vertex AI in Claude Code", p:"Alternatively, run claude and choose 3rd-party platform → Google Vertex AI at the login prompt; the wizard writes these settings for you. The ontology's script records claude --vertex with ANTHROPIC_VERTEX_REGION; current Claude Code versions use the variables below.", code:{win:R`setx CLAUDE_CODE_USE_VERTEX "1"
+setx CLOUD_ML_REGION "global"
+setx ANTHROPIC_VERTEX_PROJECT_ID "YOUR-PROJECT-ID"
+REM Open a new terminal, then run: claude`, linux:R`echo 'export CLAUDE_CODE_USE_VERTEX=1' >> ~/.bashrc
+echo 'export CLOUD_ML_REGION=global' >> ~/.bashrc
+echo 'export ANTHROPIC_VERTEX_PROJECT_ID=YOUR-PROJECT-ID' >> ~/.bashrc
+source ~/.bashrc
+claude`}}
+ ],
+ notes:[["warn","Billing","Billing starts once the trial ends or the credit is used. Set a budget alert under Billing → Budgets & alerts."]]},
+
+{id:"S3.3", tier:3, cls:"paid", title:"AWS Activate + Amazon Bedrock",
+ summary:"AWS Activate's public portal offers $1,000+ in credits. Claude runs on Amazon Bedrock, which Claude Code supports natively.",
+ flow:"<b>Where code goes:</b> AWS. EU regions (Frankfurt, Ireland, London, Paris, Stockholm) are available.",
+ req:[["OS","Windows 10+ · Linux"],["Credit","$1,000+ (approval 1–2 weeks)"],["Needs","AWS account, AWS CLI"]],
+ steps:[
+  {h:"Apply for credits and create an account", p:"Apply on the AWS Activate public portal (aws.amazon.com/activate). Create an AWS account if you do not have one."},
+  {h:"Enable Claude in Bedrock", p:"In the Bedrock console, open the Model catalog, choose an Anthropic model and submit the use-case form. Access is granted on submission."},
+  {h:"Install the AWS CLI and add credentials", code:{win:R`REM Install the MSI from https://aws.amazon.com/cli/ , open a new terminal, then:
+aws configure`, linux:R`curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+unzip /tmp/awscliv2.zip -d /tmp/aws-cli && sudo /tmp/aws-cli/aws/install
+aws configure`}},
+  {h:"Install Node.js and Claude Code", p:"Do Prerequisites P1 and P2."},
+  {h:"Enable Bedrock in Claude Code", p:"Alternatively, run claude and choose 3rd-party platform → Amazon Bedrock at the login prompt. The ontology's script records claude --bedrock with ANTHROPIC_BEDROCK_REGION; current Claude Code versions use the variables below.", code:{win:R`setx CLAUDE_CODE_USE_BEDROCK "1"
+setx AWS_REGION "us-east-1"
+REM Open a new terminal, then run: claude`, linux:R`echo 'export CLAUDE_CODE_USE_BEDROCK=1' >> ~/.bashrc
+echo 'export AWS_REGION=us-east-1' >> ~/.bashrc
+source ~/.bashrc
+claude`}}
+ ],
+ notes:[["warn","Billing","Bedrock bills per token once credits run out. Set an alert under Billing → Budgets."]]},
+
+{id:"S3.4", tier:3, cls:"paid", title:"New Anthropic API account",
+ summary:"Pay-as-you-go access to the Claude API. The ontology notes that new Console accounts have received about $5 in starting credit; check the Billing page for what your account has.",
+ flow:"<b>Where code goes:</b> Anthropic's servers (api.anthropic.com).",
+ req:[["OS","Windows 10+ · Linux"],["Credit","~$5 if offered"],["Cost","Per token after that"]],
+ steps:[
+  {h:"Create an account and a key", p:"Sign up at platform.claude.com, then Settings → API Keys → Create Key (sk-ant-…). Check Settings → Billing for your balance."},
+  {h:"Install Node.js and Claude Code", p:"Do Prerequisites P1 and P2."},
+  {h:"Remove local-endpoint variables and set the key", code:{win:R`reg delete HKCU\Environment /v ANTHROPIC_BASE_URL /f
+reg delete HKCU\Environment /v ANTHROPIC_AUTH_TOKEN /f
+setx ANTHROPIC_API_KEY "sk-ant-YOUR_KEY"
+REM Open a new terminal`, linux:R`sed -i '/ANTHROPIC_BASE_URL/d;/ANTHROPIC_AUTH_TOKEN/d' ~/.bashrc
+echo 'export ANTHROPIC_API_KEY="sk-ant-YOUR_KEY"' >> ~/.bashrc
+source ~/.bashrc`}},
+  {h:"Start a session", p:"Haiku costs far less per token; use it to stretch a small balance, and /compact to keep the context short.", code:{all:R`claude --model haiku`}}
+ ]},
+
+{id:"S3.5", tier:3, cls:"excl", title:"Anthropic Message Batches API",
+ summary:"Asynchronous bulk processing at 50% of the normal per-token price. Used from the Python or TypeScript SDK, not from the interactive CLI, so the paper excludes it from the class analysis.",
+ flow:"<b>Where code goes:</b> Anthropic's servers, as batch requests.",
+ req:[["Needs","Python 3.8+ or Node.js 18+, an API key"],["Discount","50%"],["Limits","Up to 100,000 requests per batch; results kept 29 days"]],
+ steps:[
+  {h:"Get an API key", p:"See S3.4, step 1, and set ANTHROPIC_API_KEY."},
+  {h:"Install the Python SDK", code:{win:R`pip install anthropic`, linux:R`pip install anthropic || pip install anthropic --break-system-packages`}},
+  {h:"Submit a batch", lbl:"batch_example.py", code:{all:R`import time, anthropic
+client = anthropic.Anthropic()
+
+batch = client.messages.batches.create(requests=[
+    {"custom_id": "review-001",
+     "params": {"model": "claude-haiku-4-5", "max_tokens": 1000,
+                "messages": [{"role": "user",
+                              "content": "Review for bugs:\ndef add(a, b):\n    return a - b"}]}},
+])
+
+while batch.processing_status == "in_progress":
+    time.sleep(30)
+    batch = client.messages.batches.retrieve(batch.id)
+
+for r in client.messages.batches.results(batch.id):
+    if r.result.type == "succeeded":
+        print(r.custom_id, r.result.message.content[0].text)`}},
+  {h:"Run it", code:{win:R`python batch_example.py`, linux:R`python3 batch_example.py`}}
+ ]}
+];
+
+const TIERS = [
+ [0,"Tier 0 · Practical recommendation","One hybrid setup that the ontology recommends for daily use."],
+ [1,"Tier 1 · Local","Models run on your hardware. S1.4 is the exception: its :cloud models run on Ollama's servers."],
+ [2,"Tier 2 · Free cloud, daily limits","Requests go to third-party providers within free quotas. S2.10 is a hybrid setup."],
+ [3,"Tier 3 · Free credits, temporary","Claude itself, through Anthropic, Google Cloud or AWS, paid for with time-limited credits."]
+];
+
+/* ---------- Rendering ---------- */
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+let OS = "win";
+try { const v = localStorage.getItem("atlas-os"); if (v === "win" || v === "linux") OS = v; } catch(e){}
+
+function codeBlock(code, lbl){
+  const parts = [];
+  if (code.all !== undefined) parts.push(["", code.all]);
+  else {
+    if (code.win !== undefined) parts.push(["win", code.win]);
+    if (code.linux !== undefined) parts.push(["linux", code.linux]);
+  }
+  return parts.map(([os, txt]) => {
+    const tag = lbl || (os === "win" ? "Windows · cmd" : os === "linux" ? "Linux · bash" : "");
+    return `<div class="code" ${os ? `data-os="${os}"` : ""}>${tag ? `<span class="lbl">${esc(tag)}</span>` : ""}<button type="button" class="copy">Copy</button><pre><code>${esc(txt)}</code></pre></div>`;
+  }).join("");
+}
+function stepsHtml(steps){
+  // a step with an empty heading attaches its code to the previous step
+  const merged = [];
+  steps.forEach(s => { if (!s.h && merged.length) merged[merged.length-1].extra.push(s); else merged.push({...s, extra:[]}); });
+  return `<ol class="steps">${merged.map(s => `<li><div class="step-body"><h4>${esc(s.h)}</h4>${s.p ? `<p>${esc(s.p)}</p>` : ""}${s.code ? codeBlock(s.code, s.lbl) : ""}${s.extra.map(x => codeBlock(x.code, x.lbl)).join("")}</div></li>`).join("")}</ol>`;
+}
+function noteHtml(n){ const [kind, title, body] = n; return `<div class="callout ${kind === "info" ? "info" : ""}"><b>${esc(title)}.</b> ${body}</div>`; }
+
+function render(){
+  const main = document.getElementById("main");
+  let html = `<section class="block" id="prereq"><h2 class="tier">Shared prerequisites</h2><p class="tier-note">Many configurations reuse these steps. Each card below says which ones to do first.</p>
+  <article class="sol" style="--c:var(--accent)"><ol class="steps">${PREREQ.map(p => `<li id="${p.id}"><div class="step-body"><h4>${p.id} · ${esc(p.title)}</h4><p>${esc(p.text)}</p>${codeBlock(p.code)}</div></li>`).join("")}</ol></article></section>`;
+  TIERS.forEach(([t, name, note]) => {
+    html += `<section class="block" data-tier="${t}"><h2 class="tier">${esc(name)}</h2><p class="tier-note">${esc(note)}</p><div style="display:grid;gap:18px">`;
+    SOL.filter(s => s.tier === t).forEach(s => {
+      const c = CLASS[s.cls];
+      html += `<article class="sol" id="${s.id.replace(".","-")}" data-cls="${s.cls}" data-search="${esc((s.id+" "+s.title+" "+s.summary+(s.win7?" win 7 windows 7":"")).toLowerCase())}" style="--c:var(--${s.cls})">
+        <div class="sol-head"><div class="sol-id">${s.id}</div><h3>${esc(s.title)}</h3>
+        <div class="meta"><span class="chip ${c.cls}">${c.label}</span>${s.win7 ? `<span class="tag win7">Windows 7 compatible</span>` : ""}</div></div>
+        <p class="summary">${esc(s.summary)}</p>
+        <p class="flow">${s.flow}</p>
+        <dl class="req">${s.req.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+        ${stepsHtml(s.steps)}
+        ${(s.notes||[]).map(noteHtml).join("")}
+      </article>`;
+    });
+    html += `</div></section>`;
+  });
+  html += `<p class="empty" id="none" hidden>No configuration matches this search and filter.</p>`;
+  main.innerHTML = html;
+
+  const idx = document.getElementById("index");
+  idx.innerHTML = TIERS.map(([t, name]) => `<div class="idx-group"><h3>${esc(name.split(" · ")[0])}</h3><ol>${SOL.filter(s => s.tier === t).map(s => `<li data-for="${s.id.replace(".","-")}"><a href="#${s.id.replace(".","-")}" style="--c:var(--${s.cls})"><span class="id">${s.id}</span><span><span class="dot"></span>${esc(s.title)}</span></a></li>`).join("")}</ol></div>`).join("");
+
+  const f = document.getElementById("filters");
+  f.innerHTML = Object.entries(CLASS).map(([k,c]) => `<button type="button" class="chip ${c.cls}" id="f-${k}" data-cls="${k}" aria-pressed="true">${c.label}</button>`).join("");
+}
+
+function applyOS(){
+  document.querySelectorAll(".code[data-os]").forEach(el => el.hidden = el.dataset.os !== OS);
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.os === OS)));
+}
+function applyFilter(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const on = new Set([...document.querySelectorAll("#filters button")].filter(b => b.getAttribute("aria-pressed") === "true").map(b => b.dataset.cls));
+  let shown = 0;
+  document.querySelectorAll("article.sol[data-cls]").forEach(a => {
+    const ok = on.has(a.dataset.cls) && (!q || a.dataset.search.includes(q));
+    a.hidden = !ok; if (ok) shown++;
+    const li = document.querySelector(`li[data-for="${a.id}"]`); if (li) li.hidden = !ok;
+  });
+  document.querySelectorAll("section.block[data-tier]").forEach(sec => { sec.hidden = !sec.querySelector("article.sol:not([hidden])"); });
+  document.getElementById("none").hidden = shown > 0;
+}
+
+render(); applyOS(); applyFilter();
+
+document.querySelector(".seg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-os]"); if (!b) return;
+  OS = b.dataset.os; try { localStorage.setItem("atlas-os", OS); } catch(err){}
+  applyOS();
+});
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button[data-cls]"); if (!b) return;
+  b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); applyFilter();
+});
+document.getElementById("q").addEventListener("input", applyFilter);
+document.getElementById("main").addEventListener("click", e => {
+  const b = e.target.closest("button.copy"); if (!b) return;
+  const pre = b.parentElement.querySelector("pre"); const text = pre.innerText;
+  const done = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1400); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; setTimeout(() => b.textContent = "Copy", 1400); };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch(err){ fallback(); }
+});
+</script>
+
+</body>
+</html>

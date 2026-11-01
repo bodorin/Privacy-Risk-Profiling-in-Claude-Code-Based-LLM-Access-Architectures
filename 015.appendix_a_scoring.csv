@@ -1,0 +1,27 @@
+id,name,class,stats_class,AV,PR,UI,C,score,table5_target,regime
+S1.1,Ollama local,Pure Local,Pure Local,0.00,0.00,0.00,0.267,0.8,0.8,
+S1.2,Ollama + Gemma 4 27B,Pure Local,Pure Local,0.00,0.00,0.00,0.000,0.0,,
+S1.3,llama.cpp local,Pure Local,Pure Local,0.00,0.00,0.00,0.133,0.4,,
+S1.5,llama.cpp + FCC proxy (Win7),Pure Local,Pure Local,0.20,0.00,0.00,0.467,2.0,,
+T0a,CCR local-only,Hybrid,excluded,0.00,0.00,0.00,0.267,0.8,0.8,local-only
+T0b,CCR light mixing,Hybrid,Hybrid,0.20,0.20,0.20,0.200,2.0,,light
+T0c,CCR typical mixed use,Hybrid,Hybrid,0.40,0.30,0.40,0.200,3.2,3.2,typical
+T0d,CCR heavy mixing,Hybrid,Hybrid,0.65,0.50,0.60,0.283,5.0,,heavy
+S2.10,Hybrid routing (alt.) typical,Hybrid,Hybrid,0.30,0.25,0.30,0.200,2.6,,typical
+S1.4,Ollama cloud suffix,Free Cloud,Free Cloud,0.85,0.62,0.85,0.670,7.5,,
+S2.1,OpenRouter,Free Cloud,Free Cloud,0.85,0.62,0.85,0.637,7.4,7.4,
+S2.2,Google AI Studio,Free Cloud,Free Cloud,0.85,0.62,0.85,0.670,7.5,,
+S2.3,Groq,Free Cloud,Free Cloud,0.85,0.62,0.85,0.637,7.4,7.4,
+S2.4,NVIDIA NIM,Free Cloud,Free Cloud,0.85,0.62,0.85,0.670,7.5,,
+S2.5,Free tier provider S2.5,Free Cloud,Free Cloud,0.85,0.62,0.85,0.337,6.5,,
+S2.6,Free tier provider S2.6,Free Cloud,Free Cloud,0.85,0.62,0.85,0.670,7.5,,
+S2.7,Free tier provider S2.7,Free Cloud,Free Cloud,0.85,0.62,0.85,1.000,8.5,,
+S2.8,LiteLLM proxy fallback,Free Cloud,Free Cloud,0.85,0.62,0.85,0.770,7.8,7.8,
+S2.9,claude-code-proxy (Win7),Free Cloud,Free Cloud,0.85,0.62,0.85,0.637,7.4,,
+S3.1,Paid/temp credits S3.1,Paid/Temp,Paid/Temp,0.85,0.62,0.85,0.170,6.0,,
+S3.2,Paid/temp credits S3.2,Paid/Temp,Paid/Temp,0.85,0.62,0.85,0.403,6.7,,
+S3.3,Paid/temp credits S3.3,Paid/Temp,Paid/Temp,0.85,0.62,0.85,0.503,7.0,,
+S3.4,Paid/temp credits S3.4,Paid/Temp,Paid/Temp,0.85,0.62,0.85,0.670,7.5,,
+BL1,Claude Code - Anthropic API default,Commercial,Commercial,0.85,0.62,0.85,0.937,8.3,8.3,
+BL2,GitHub Copilot,Commercial,Commercial,0.85,0.62,0.62,0.723,7.2,7.2,
+BL3,Cursor,Commercial,Commercial,0.85,0.62,0.62,0.490,6.5,6.5,
