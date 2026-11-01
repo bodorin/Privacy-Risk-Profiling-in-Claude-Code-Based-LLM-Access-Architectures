@@ -1,0 +1,10 @@
+If and When using these resources, 
+you default agree you use them under GPL 3.0 licence, 
+and cite the corresponding parent paper as:
+
+J.L. de Miranda, M. Nagy, N. Popescu-Bodorin, 
+Privacy Risk Profiling in Claude Code-Based LLM Access Architectures - A Systematic Analysis, 
+Int. J. Comput. Commun. Control 
+(Online ISSN 1841-9844, ISSN-L 1841-9836), 
+volume(issue), artnum, 2026.
+
